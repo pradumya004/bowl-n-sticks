@@ -1,0 +1,23 @@
+# --- Local Claude working files (keep private, do not push) ---
+.claude/
+menu.txt
+
+# --- Secrets / env (NEVER commit) ---
+.env
+.env.*
+!.env.example
+
+# --- Node / build output (belt-and-suspenders; web/ has its own too) ---
+node_modules/
+.next/
+out/
+dist/
+build/
+*.log
+npm-debug.log*
+
+# --- OS / editor junk ---
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
