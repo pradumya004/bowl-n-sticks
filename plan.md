@@ -1,8 +1,8 @@
-# Maggilicious — Digital Menu & Admin Platform · Master Plan
+# Bowl n Sticks — Digital Menu & Admin Platform · Master Plan
 
 > Living document. We update this as we finish each phase. Checkboxes = source of truth for "what's done."
-> **Cafe:** Maggilicious (spelled with double-g — pun on *Maggi* noodles) · Karwar · anime / Japanese-Korean themed · signature = noodles/ramen/maggi.
-> **Instagram:** @maggilicious_cafe · **Zomato:** 4.2★
+> **Cafe:** working name **"Bowl n Sticks"** (repo `bowl-n-sticks`) — name is being changed from "Maggilicious"; final name TBD by owners. Brand name stays OUT of code (comes from DB) so the switch is trivial.
+> Karwar · anime / Japanese-Korean themed · signature = noodles/ramen/maggi. · **Instagram:** @maggilicious_cafe · **Zomato:** 4.2★
 
 ---
 
@@ -90,18 +90,18 @@ Veg/egg/non-veg/spicy tags, combo upgrades, and toppings from the real menu all 
 ## 8. Phases
 
 ### Phase 0 — Foundations & Setup
-- [ ] Confirm Node & Git installed.
-- [ ] Create GitHub repo + local git.
-- [ ] Create Supabase project (cloud) + save keys in `.env.local`.
-- [ ] Scaffold Next.js app, run it locally, see the starter page.
-- [ ] First commit + push.
-- [ ] Connect Vercel to the repo (auto-deploy on push) — get a live URL early.
+- [x] Confirm Node & Git installed. (Node 20.11, npm 10.2.4, git 2.52)
+- [x] Create GitHub repo + local git. → private repo `pradumya004/bowl-n-sticks`, branch `main`.
+- [x] Scaffold Next.js app, run it locally, see the starter page. → Next 16 (App Router, JS) + Tailwind v4 in `web/`.
+- [x] First commit + push.
+- [x] Connect Vercel to the repo (auto-deploy on push) — Root Directory = `web`. Live URL on Vercel.
+- [x] Create Supabase project (cloud) + save keys in `web/.env.local`. → project ref `bxwfcyhlvfknkpivpjis`, region Mumbai/Singapore, new-style publishable key.
 
 ### Phase 1 — Data Model + Real Menu Seed
-- [ ] Design the SQL schema (tables above) in Supabase.
-- [ ] Set up Row-Level Security (public read, admin write).
-- [ ] Enter the **real Maggilicious menu** as seed data (all ~22 sections + items + prices + tags + combos + add-ons).
-- [ ] Wire the Supabase client into Next.js; fetch the menu.
+- [x] Design the SQL schema in Supabase. → `db/schema.sql` run; 5 tables live (verified via REST API).
+- [x] Row-Level Security: public read done (anon reads active rows). Admin write policies deferred to Phase 4.
+- [x] Enter the **real menu** as seed data → `db/seed.sql` run. Verified: 1 cafe, 4 tables, 23 sections, 141 items, 16 combo options. (diet_type/is_spicy/protein still to be double-checked against the printed menu by owner.)
+- [x] Wire the Supabase client into Next.js; fetch the menu. → `web/lib/supabaseClient.js` + test fetch in `app/page.js` renders all sections + items. Phase 1 COMPLETE.
 
 ### Phase 2 — Customer Menu UI (the "wow")
 - [ ] Design direction locked (see §9) — real inspiration, not AI-generic.
@@ -172,4 +172,7 @@ Veg/egg/non-veg/spicy tags, combo upgrades, and toppings from the real menu all 
 
 ## 12. Status Log
 
-- **2026-09-21** — Plan created. Scope + stack locked (view-only Phase 1, Next.js + Supabase). Menu PDF parsed (~22 sections). Next up: Phase 0 setup, coded side-by-side.
+- **2026-09-21** — Plan created. Scope + stack locked (view-only Phase 1, Next.js + Supabase). Menu PDF parsed (~22 sections).
+- **2026-09-21** — **Phase 1 COMPLETE.** `@supabase/supabase-js` installed; `web/lib/supabaseClient.js` created; `app/page.js` test fetch renders all sections + items end to end. Next: Phase 2 (customer menu UI + design direction).
+- **2026-09-21** — **Phase 1 (data): schema + seed done.** `db/schema.sql` + `db/seed.sql` run on Supabase. Verified via REST API: 1 cafe, 4 tables (T1-T4), 23 sections, 141 items, 16 combo options; RLS public-read works; nested reads work. Left to do in Phase 1: wire `@supabase/supabase-js` into Next and fetch the menu. Owner still to verify diet_type/is_spicy/protein against the printed menu.
+- **2026-09-21** — **Phase 0 COMPLETE.** Node 20.11/npm 10.2.4/git 2.52 verified. Next.js 16 (App Router, JS) + Tailwind v4 scaffolded in `web/`, runs locally. Private GitHub repo `pradumya004/bowl-n-sticks` (branch `main`). Vercel connected (Root Directory `web`, auto-deploy on push). Supabase project `bxwfcyhlvfknkpivpjis` provisioned; `web/.env.local` holds URL + publishable key (new-style keys). Name in flux ("Bowl n Sticks" working name). Next up: Phase 1 — schema design + real menu seed.
