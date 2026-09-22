@@ -44,3 +44,14 @@ export async function getMenu() {
   }));
   return { cafe: cafeRes.data, sections };
 }
+
+// Look up one table by its code (e.g. "T1").
+// Returns {code, label} or null if not found.
+export async function getTable(code) {
+  const { data } = await supabase
+    .from("dining_table")
+    .select("code, label")
+    .eq("code", code)
+    .maybeSingle(); // null instead of an error when no row matches
+  return data;
+}

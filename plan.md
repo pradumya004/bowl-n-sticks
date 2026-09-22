@@ -170,9 +170,21 @@ Veg/egg/non-veg/spicy tags, combo upgrades, and toppings from the real menu all 
 
 ---
 
+## Environment Variables
+
+Set in `web/.env.local` (local dev) AND in Vercel → Settings → Environment Variables (live). Both are PUBLIC (safe in the browser); Supabase RLS keeps the key read-only.
+
+| Variable | What it's for | Where to find it |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Which Supabase project/database the app connects to (base URL). | Supabase → Project Settings → Data API |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public read-only key the browser uses to fetch the menu. | Supabase → Project Settings → API Keys |
+
+---
+
 ## 12. Status Log
 
 - **2026-09-21** — Plan created. Scope + stack locked (view-only Phase 1, Next.js + Supabase). Menu PDF parsed (~22 sections).
+- **2026-09-22** — **Phase 2 DONE + LIVE.** Added the two `NEXT_PUBLIC_SUPABASE_*` vars to Vercel (type: Config) and redeployed; live at https://bowl-n-sticks.vercel.app. Desktop responsiveness fixed (footer rules 2-col, blurb width, grid overflow, featured cells). Starting Phase 3 (QR + per-table route), back to side-by-side.
 - **2026-09-22** — **Phase 2 customer menu UI built.** `app/page.js` renders the live menu: Marquee, Hero (brand name from DB), sticky SectionNav (client, IntersectionObserver), DishCard (diet mark, stickers, protein, options), Footer (socials + rules). Responsive grid (1/2/3 cols, featured full-width). Palette/fonts as `@theme` tokens in `globals.css`; card/chrome CSS ported from approved `03-manga-plus`. Lint clean. Remaining: search + veg/spicy filter (deferred, ask owner), Lottie, real photos (Phase 5), Vercel env vars for live deploy.
 - **2026-09-21** — **Phase 1 COMPLETE.** `@supabase/supabase-js` installed; `web/lib/supabaseClient.js` created; `app/page.js` test fetch renders all sections + items end to end. Next: Phase 2 (customer menu UI + design direction).
 - **2026-09-21** — **Phase 1 (data): schema + seed done.** `db/schema.sql` + `db/seed.sql` run on Supabase. Verified via REST API: 1 cafe, 4 tables (T1-T4), 23 sections, 141 items, 16 combo options; RLS public-read works; nested reads work. Left to do in Phase 1: wire `@supabase/supabase-js` into Next and fetch the menu. Owner still to verify diet_type/is_spicy/protein against the printed menu.

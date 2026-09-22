@@ -1,6 +1,6 @@
 // Top-of-page hero. Brand name comes from the DB (cafe.name), never hardcoded,
 // so a rename is a data change. The last word gets the stroked "pop" treatment.
-export default function Hero({ cafe }) {
+export default function Hero({ cafe, tableLabel }) {
   const words = (cafe?.name ?? "").trim().split(" ");
   const lead = words.slice(0, -1).join(" ");
   const last = words.at(-1);
@@ -15,7 +15,10 @@ export default function Hero({ cafe }) {
       </h1>
       {cafe?.tagline && <p>{cafe.tagline}</p>}
       <div className="tablechip">
-        <span className="pin" /> A waiter will take your order
+        <span className="pin" />
+        {tableLabel
+          ? `You're at ${tableLabel} · a waiter will take your order`
+          : "A waiter will take your order"}
       </div>
     </header>
   );
