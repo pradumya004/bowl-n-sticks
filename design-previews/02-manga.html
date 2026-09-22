@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bowl n Sticks - Manga Pop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF7EF; --ink:#141414; --red:#FF3B30; --yellow:#FFC53D; --line:#141414;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:Inter,system-ui,sans-serif; line-height:1.5;
+    background-image:radial-gradient(rgba(20,20,20,.06) 1.2px, transparent 1.3px);
+    background-size:14px 14px;
+  }
+  .wrap{max-width:520px;margin:0 auto;padding:0 16px 64px}
+  .hero{padding:44px 0 20px;text-align:center}
+  .kicker{display:inline-block;font-family:Space Grotesk;font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase;background:var(--yellow);border:2px solid var(--ink);border-radius:8px;padding:5px 10px;transform:rotate(-2deg)}
+  .hero h1{font-family:Space Grotesk;font-weight:700;font-size:clamp(46px,14vw,78px);line-height:.92;margin-top:16px;letter-spacing:-.02em;text-transform:uppercase}
+  .hero h1 span{color:var(--paper);-webkit-text-stroke:2px var(--ink);text-shadow:4px 4px 0 var(--red)}
+  .hero p{margin-top:14px;font-size:15px;font-weight:500}
+  .tablechip{display:inline-block;margin-top:18px;padding:8px 14px;background:#fff;border:2px solid var(--ink);border-radius:10px;font-size:13px;font-weight:600;box-shadow:3px 3px 0 var(--ink)}
+  nav{position:sticky;top:0;z-index:5;display:flex;gap:8px;overflow-x:auto;padding:12px 0;background:var(--paper);border-bottom:2px solid var(--ink);margin-bottom:8px}
+  nav a{white-space:nowrap;font-family:Space Grotesk;font-weight:700;font-size:13px;color:var(--ink);text-decoration:none;padding:7px 14px;border:2px solid var(--ink);border-radius:10px;background:#fff}
+  nav a.on{background:var(--red);color:#fff}
+  .sec{padding:26px 0 8px}
+  .sec h2{font-family:Space Grotesk;font-weight:700;font-size:30px;text-transform:uppercase;display:inline-block;border-bottom:5px solid var(--yellow);line-height:1.1}
+  .blurb{font-size:13px;font-weight:500;margin:8px 0 18px;opacity:.8}
+  .card{background:#fff;border:2px solid var(--ink);border-radius:16px;padding:12px;margin-bottom:14px;display:flex;gap:12px;box-shadow:4px 4px 0 var(--ink);transition:transform .12s ease, box-shadow .12s ease}
+  .card:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+  .thumb{flex:0 0 74px;height:74px;border-radius:12px;border:2px solid var(--ink);display:grid;place-items:center;font-size:32px;background:var(--yellow)}
+  .m{flex:1;min-width:0}
+  .top{display:flex;align-items:center;gap:8px}
+  .top h3{font-family:Space Grotesk;font-weight:700;font-size:16px}
+  .price{margin-left:auto;font-family:Space Grotesk;font-weight:700;background:var(--red);color:#fff;padding:2px 8px;border-radius:8px;border:2px solid var(--ink)}
+  .desc{font-size:13px;font-weight:500;opacity:.8;margin-top:3px}
+  .tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center}
+  .sticker{font-family:Space Grotesk;font-weight:700;font-size:10.5px;text-transform:uppercase;background:var(--yellow);border:2px solid var(--ink);border-radius:7px;padding:3px 8px;transform:rotate(-3deg)}
+  .feat{border-width:3px;box-shadow:6px 6px 0 var(--red)}
+  .feat .thumb{flex-basis:90px;height:90px;font-size:40px}
+  .diet{width:15px;height:15px;border-radius:3px;display:inline-grid;place-items:center;flex:0 0 auto}
+  .diet::before{content:"";width:7px;height:7px;border-radius:50%}
+  .diet.veg{border:1.5px solid #2E7D32}.diet.veg::before{background:#2E7D32}
+  .diet.egg{border:1.5px solid #E7B416}.diet.egg::before{background:#E7B416}
+  .diet.nonveg{border:1.5px solid #C62828}.diet.nonveg::before{background:#C62828}
+  .chili{font-size:12px}
+  .opts{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px}
+  .opt{font-size:12px;font-weight:600;background:var(--paper);border:2px solid var(--ink);border-radius:999px;padding:3px 9px}
+  .opt b{color:var(--red)}
+  footer{text-align:center;padding-top:40px}
+  footer .ita{font-family:Space Grotesk;font-weight:700;font-size:24px;background:var(--yellow);display:inline-block;border:2px solid var(--ink);border-radius:12px;padding:8px 16px;transform:rotate(-1deg);box-shadow:4px 4px 0 var(--ink)}
+  footer p{margin-top:14px;font-weight:600;font-size:13px}
+  footer a{color:var(--red);font-weight:700;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="kicker">Karwar's first anime cafe</div>
+    <h1>Bowl n <span>Sticks</span></h1>
+    <p>Made by students, for students. Slurp loud.</p>
+    <div class="tablechip">Table 2 · call a waiter to order</div>
+  </header>
+
+  <nav>
+    <a class="on" href="#ramen">Ramen</a><a href="#combos">Combos</a><a href="#maggi">Maggi</a><a href="#burgers">Burgers</a>
+  </nav>
+
+  <section class="sec" id="ramen">
+    <h2>Ramen</h2>
+    <p class="blurb">Fusion Korean/Japanese ramen. All bowls contain egg (removable on request).</p>
+    <div class="card feat">
+      <div class="thumb">🍜</div>
+      <div class="m"><div class="top"><span class="diet nonveg"></span><h3>Spicy Korean Chicken Ramen</h3><span class="price">₹230</span></div>
+      <div class="desc">Fiery gochujang broth. The one everyone posts.</div>
+      <div class="tags"><span class="sticker">Fan fav</span><span class="chili">🌶</span></div></div>
+    </div>
+    <div class="card"><div class="thumb">🍜</div><div class="m"><div class="top"><span class="diet egg"></span><h3>Paneer Ramen</h3><span class="price">₹180</span></div></div></div>
+    <div class="card"><div class="thumb">🍜</div><div class="m"><div class="top"><span class="diet nonveg"></span><h3>Chicken Ramen</h3><span class="price">₹190</span></div></div></div>
+    <div class="card"><div class="thumb">🍜</div><div class="m"><div class="top"><span class="diet nonveg"></span><h3>Chicken Crispy Ramen</h3><span class="price">₹220</span></div></div></div>
+    <div class="card"><div class="thumb">🍜</div><div class="m"><div class="top"><span class="diet egg"></span><h3>Spicy Korean Paneer Ramen</h3><span class="price">₹200</span></div><div class="tags"><span class="chili">🌶</span></div></div></div>
+  </section>
+
+  <section class="sec" id="combos">
+    <h2>Combos</h2>
+    <p class="blurb">Meal combos served with fries + coke.</p>
+    <div class="card feat"><div class="thumb">🍥</div><div class="m"><div class="top"><span class="diet veg"></span><h3>Maggi Meals</h3><span class="price">₹129</span></div>
+    <div class="desc">Classic maggi + fries + coke. 26g protein.</div>
+    <div class="tags"><span class="sticker">Highest selling</span></div>
+    <div class="opts"><span class="opt">Paneer <b>+₹60</b></span><span class="opt">Popcorn <b>+₹90</b></span><span class="opt">Crispy <b>+₹130</b></span></div></div></div>
+    <div class="card"><div class="thumb">🍕</div><div class="m"><div class="top"><span class="diet veg"></span><h3>Pizza Combo</h3><span class="price">₹269</span></div><div class="desc">1 medium veg pizza + fries + coke.</div><div class="tags"><span class="sticker">Most ordered</span></div><div class="opts"><span class="opt">Cheese <b>+₹20</b></span><span class="opt">Paneer <b>+₹80</b></span><span class="opt">Chicken <b>+₹100</b></span></div></div></div>
+  </section>
+
+  <section class="sec" id="maggi">
+    <h2>Maggi</h2>
+    <p class="blurb">Homemade recipes perfected over 4 years.</p>
+    <div class="card"><div class="thumb">🍜</div><div class="m"><div class="top"><span class="diet veg"></span><h3>Classic Maggi</h3><span class="price">₹60</span></div></div></div>
+    <div class="card"><div class="thumb">🧈</div><div class="m"><div class="top"><span class="diet veg"></span><h3>Butter Maggi</h3><span class="price">₹80</span></div></div></div>
+    <div class="card"><div class="thumb">🧀</div><div class="m"><div class="top"><span class="diet veg"></span><h3>Cheese Maggi</h3><span class="price">₹120</span></div></div></div>
+    <div class="card"><div class="thumb">🍜</div><div class="m"><div class="top"><span class="diet veg"></span><h3>Paneer Maggi</h3><span class="price">₹140</span></div></div></div>
+    <div class="card"><div class="thumb">🍗</div><div class="m"><div class="top"><span class="diet nonveg"></span><h3>Chicken Maggi</h3><span class="price">₹140</span></div></div></div>
+  </section>
+
+  <footer>
+    <div class="ita">いただきます Itadakimasu!</div>
+    <p><a href="#">@maggilicious_cafe</a> · Zomato 4.2★<br>more new dishes coming soon</p>
+  </footer>
+</div>
+</body>
+</html>

@@ -104,12 +104,12 @@ Veg/egg/non-veg/spicy tags, combo upgrades, and toppings from the real menu all 
 - [x] Wire the Supabase client into Next.js; fetch the menu. → `web/lib/supabaseClient.js` + test fetch in `app/page.js` renders all sections + items. Phase 1 COMPLETE.
 
 ### Phase 2 — Customer Menu UI (the "wow")
-- [ ] Design direction locked (see §9) — real inspiration, not AI-generic.
-- [ ] Mobile-first layout: hero, sticky section nav, section blocks, item cards with photo/tags/price.
-- [ ] Veg/egg/non-veg/spicy indicators, "featured/fan-favorite" treatment, combos & add-ons display.
-- [ ] Search + filter (veg-only, spicy, section jump).
-- [ ] Anime/Japanese polish: motion, typography, *Itadakimasu*, subtle theming.
-- [ ] Performance pass (see §10).
+- [x] Design direction locked → bold "Manga Pop", preview `design-previews/03-manga-plus.html` (02 kept for reference). Strict palette: cream/ink/red/yellow. Now building into Next.
+- [x] Mobile-first layout: marquee, hero, sticky section nav, section blocks, item cards. Responsive grid (1 col phone / up to 3 desktop; featured spans full width).
+- [x] Veg/egg/non-veg/spicy indicators, featured treatment (red shadow + bob), combos & options display, badge/protein stickers.
+- [~] Search + filter: **section jump done** (sticky nav + IntersectionObserver active state). Search + veg-only/spicy filter NOT built yet — decide with owner.
+- [x] Anime/Japanese polish: motion (marquee, pop, wiggle, bob, spin, chili shake), Space Grotesk + Inter, *Itadakimasu*, halftone.
+- [ ] Performance pass → deferred to Phase 7 (pairs with real images in Phase 5). Currently server-rendered, emoji placeholders.
 
 ### Phase 3 — QR Codes
 - [ ] Generate permanent QR PNG/SVG for T1–T4 pointing at `/t/{code}`.
@@ -173,6 +173,7 @@ Veg/egg/non-veg/spicy tags, combo upgrades, and toppings from the real menu all 
 ## 12. Status Log
 
 - **2026-09-21** — Plan created. Scope + stack locked (view-only Phase 1, Next.js + Supabase). Menu PDF parsed (~22 sections).
+- **2026-09-22** — **Phase 2 customer menu UI built.** `app/page.js` renders the live menu: Marquee, Hero (brand name from DB), sticky SectionNav (client, IntersectionObserver), DishCard (diet mark, stickers, protein, options), Footer (socials + rules). Responsive grid (1/2/3 cols, featured full-width). Palette/fonts as `@theme` tokens in `globals.css`; card/chrome CSS ported from approved `03-manga-plus`. Lint clean. Remaining: search + veg/spicy filter (deferred, ask owner), Lottie, real photos (Phase 5), Vercel env vars for live deploy.
 - **2026-09-21** — **Phase 1 COMPLETE.** `@supabase/supabase-js` installed; `web/lib/supabaseClient.js` created; `app/page.js` test fetch renders all sections + items end to end. Next: Phase 2 (customer menu UI + design direction).
 - **2026-09-21** — **Phase 1 (data): schema + seed done.** `db/schema.sql` + `db/seed.sql` run on Supabase. Verified via REST API: 1 cafe, 4 tables (T1-T4), 23 sections, 141 items, 16 combo options; RLS public-read works; nested reads work. Left to do in Phase 1: wire `@supabase/supabase-js` into Next and fetch the menu. Owner still to verify diet_type/is_spicy/protein against the printed menu.
 - **2026-09-21** — **Phase 0 COMPLETE.** Node 20.11/npm 10.2.4/git 2.52 verified. Next.js 16 (App Router, JS) + Tailwind v4 scaffolded in `web/`, runs locally. Private GitHub repo `pradumya004/bowl-n-sticks` (branch `main`). Vercel connected (Root Directory `web`, auto-deploy on push). Supabase project `bxwfcyhlvfknkpivpjis` provisioned; `web/.env.local` holds URL + publishable key (new-style keys). Name in flux ("Bowl n Sticks" working name). Next up: Phase 1 — schema design + real menu seed.

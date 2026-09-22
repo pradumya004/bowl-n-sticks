@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bowl n Sticks - Manga Pop+</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Consistent palette: cream + ink + ONE primary (red) + ONE accent (yellow).
+     Rules that never change:
+       - ink   = all borders, all default shadows, price tag, text
+       - red   = the ONE highlight (featured shadow, primary sticker, links)
+       - yellow= the ONE accent (hero kicker, section highlighter, thumbnails, info sticker) */
+  :root{
+    --paper:#FBF3E7; --ink:#141210; --red:#FF3B30; --yellow:#FFC53D;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:Inter,system-ui,sans-serif; line-height:1.5; overflow-x:hidden;
+    background-image:radial-gradient(rgba(20,18,16,.07) 1.2px, transparent 1.3px);
+    background-size:15px 15px;
+  }
+  .wrap{max-width:520px;margin:0 auto;padding:0 16px 70px}
+
+  /* marquee ribbon */
+  .ribbon{background:var(--ink);color:var(--paper);overflow:hidden;white-space:nowrap;border-bottom:2px solid var(--ink)}
+  .ribbon .track{display:inline-block;padding:9px 0;font-family:Space Grotesk;font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;animation:marquee 18s linear infinite}
+  .ribbon .track span{padding:0 18px}
+  .ribbon .track span::after{content:"🍜";padding-left:18px}
+  @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* hero */
+  .hero{padding:34px 0 20px;text-align:center;position:relative}
+  .kicker{display:inline-block;font-family:Space Grotesk;font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase;background:var(--yellow);border:2.5px solid var(--ink);border-radius:9px;padding:6px 12px;transform:rotate(-2deg);box-shadow:3px 3px 0 var(--ink)}
+  .hero h1{font-family:Space Grotesk;font-weight:700;font-size:clamp(48px,15vw,84px);line-height:.9;margin-top:18px;letter-spacing:-.03em;text-transform:uppercase}
+  .hero h1 .out{color:var(--paper);-webkit-text-stroke:2.5px var(--ink);text-shadow:5px 5px 0 var(--red);animation:pop .5s cubic-bezier(.2,1.4,.4,1) both}
+  @keyframes pop{from{transform:scale(.7) rotate(-4deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+  .hero p{margin-top:14px;font-size:15px;font-weight:500}
+  .star{position:absolute;font-size:24px;color:var(--ink);animation:spin 6s linear infinite}
+  .star.a{top:24px;right:18px}.star.b{top:96px;left:10px;animation-direction:reverse}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .tablechip{display:inline-flex;gap:8px;align-items:center;margin-top:18px;padding:9px 15px;background:#fff;border:2.5px solid var(--ink);border-radius:12px;font-size:13px;font-weight:600;box-shadow:4px 4px 0 var(--ink)}
+  .tablechip .pin{width:9px;height:9px;border-radius:50%;background:var(--red);box-shadow:0 0 0 3px rgba(255,59,48,.25);animation:blink 1.4s ease-in-out infinite}
+  @keyframes blink{50%{box-shadow:0 0 0 6px rgba(255,59,48,0)}}
+
+  /* nav */
+  nav{position:sticky;top:0;z-index:6;display:flex;gap:8px;overflow-x:auto;padding:12px 0;background:var(--paper);border-bottom:2.5px solid var(--ink);margin-bottom:6px}
+  nav::-webkit-scrollbar{display:none}
+  nav a{white-space:nowrap;font-family:Space Grotesk;font-weight:700;font-size:13px;color:var(--ink);text-decoration:none;padding:8px 15px;border:2.5px solid var(--ink);border-radius:11px;background:#fff;box-shadow:2px 2px 0 var(--ink);transition:.12s}
+  nav a:hover{transform:translateY(-2px);box-shadow:3px 4px 0 var(--ink)}
+  nav a.on{background:var(--red);color:#fff}
+
+  /* sections - ONE highlighter colour (yellow) everywhere */
+  .sec{padding:26px 0 8px}
+  .sec h2{font-family:Space Grotesk;font-weight:700;font-size:32px;text-transform:uppercase;display:inline;line-height:1;background:linear-gradient(transparent 62%, var(--yellow) 62% 92%, transparent 92%);padding:0 2px}
+  .blurb{font-size:13px;font-weight:500;margin:12px 0 18px;opacity:.8}
+
+  /* cards - ink border + ink shadow, always */
+  .card{background:#fff;border:2.5px solid var(--ink);border-radius:18px;padding:12px;margin-bottom:14px;display:flex;gap:12px;box-shadow:4px 4px 0 var(--ink);transition:transform .14s ease, box-shadow .14s ease}
+  .card:hover{transform:translate(-3px,-3px) rotate(-.4deg);box-shadow:7px 7px 0 var(--ink)}
+  .thumb{flex:0 0 76px;height:76px;border-radius:14px;border:2.5px solid var(--ink);display:grid;place-items:center;font-size:33px;background:var(--yellow)}
+  .m{flex:1;min-width:0}
+  .top{display:flex;align-items:center;gap:8px}
+  .top h3{font-family:Space Grotesk;font-weight:700;font-size:16px}
+  .price{margin-left:auto;font-family:Space Grotesk;font-weight:700;background:var(--ink);color:#fff;padding:3px 9px;border-radius:9px;transform:rotate(2deg)}
+  .desc{font-size:13px;font-weight:500;opacity:.8;margin-top:3px}
+  .tags{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap;align-items:center}
+
+  /* stickers - only two: red = primary/headline, yellow = info. Nothing else. */
+  .sticker{font-family:Space Grotesk;font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.02em;border:2px solid var(--ink);border-radius:8px;padding:3px 9px;box-shadow:2px 2px 0 var(--ink)}
+  .sticker.red{background:var(--red);color:#fff}
+  .sticker.yellow{background:var(--yellow)}
+  .card:hover .sticker{animation:wiggle .4s ease}
+  @keyframes wiggle{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+
+  /* featured - the ONE place red shadow appears */
+  .feat{border-width:3px;box-shadow:6px 6px 0 var(--red)}
+  .feat .thumb{flex-basis:92px;height:92px;font-size:42px;animation:bob 2.6s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-6px) rotate(-3deg)}}
+
+  /* diet + chili */
+  .diet{width:15px;height:15px;border-radius:3px;display:inline-grid;place-items:center;flex:0 0 auto}
+  .diet::before{content:"";width:7px;height:7px;border-radius:50%}
+  .diet.veg{border:1.5px solid #2E7D32}.diet.veg::before{background:#2E7D32}
+  .diet.egg{border:1.5px solid #E7B416}.diet.egg::before{background:#E7B416}
+  .diet.nonveg{border:1.5px solid #C62828}.diet.nonveg::before{background:#C62828}
+  .chili{font-size:13px;animation:shake 2s ease-in-out infinite}
+  @keyframes shake{0%,90%,100%{transform:rotate(0)}93%{transform:rotate(-12deg)}96%{transform:rotate(12deg)}}
+
+  /* options */
+  .opts{margin-top:11px;display:flex;flex-wrap:wrap;gap:7px}
+  .opt{font-size:12px;font-weight:600;background:var(--paper);border:2px solid var(--ink);border-radius:999px;padding:4px 10px}
+  .opt b{color:var(--red)}
+
+  footer{text-align:center;padding-top:44px}
+  footer .ita{font-family:Space Grotesk;font-weight:700;font-size:24px;background:var(--yellow);display:inline-block;border:2.5px solid var(--ink);border-radius:14px;padding:9px 18px;transform:rotate(-1.5deg);box-shadow:4px 4px 0 var(--ink)}
+  footer p{margin-top:16px;font-weight:600;font-size:13px}
+  footer a{color:var(--red);font-weight:700;text-decoration:none}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+  <div class="ribbon"><div class="track">
+    <span>Itadakimasu</span><span>Slurp Loud</span><span>Karwar's First Anime Cafe</span><span>Made By Students</span>
+    <span>Itadakimasu</span><span>Slurp Loud</span><span>Karwar's First Anime Cafe</span><span>Made By Students</span>
+  </div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="star a">✦</span><span class="star b">✧</span>
+    <div class="kicker">Karwar's first anime cafe</div>
+    <h1>Bowl n <span class="out">Sticks</span></h1>
+    <p>Ramen, maggi &amp; good vibes. Made by students, for students.</p>
+    <div class="tablechip"><span class="pin"></span> Table 2 · call a waiter to order</div>
+  </header>
+
+  <nav>
+    <a class="on" href="#ramen">Ramen</a><a href="#combos">Combos</a><a href="#maggi">Maggi</a><a href="#burgers">Burgers</a>
+  </nav>
+
+  <section class="sec" id="ramen">
+    <h2>Ramen</h2>
+    <p class="blurb">Fusion Korean/Japanese ramen. All bowls contain egg (removable on request).</p>
+    <div class="card feat">
+      <div class="thumb">🍜</div>
+      <div class="m"><div class="top"><span class="diet nonveg"></span><h3>Spicy Korean Chicken Ramen</h3><span class="price">₹230</span></div>
+      <div class="desc">Fiery gochujang broth. The one everyone posts.</div>
+      <div class="tags"><span class="sticker red">Fan fav</span><span class="chili">🌶</span></div></div>
+    </div>
+    <div class="card"><div class="thumb">🍜</div><div class="m"><div class="top"><span class="diet egg"></span><h3>Paneer Ramen</h3><span class="price">₹180</span></div></div></div>
+    <div class="card"><div class="thumb">🍜</div><div class="m"><div class="top"><span class="diet nonveg"></span><h3>Chicken Ramen</h3><span class="price">₹190</span></div></div></div>
+    <div class="card"><div class="thumb">🍜</div><div class="m"><div class="top"><span class="diet nonveg"></span><h3>Chicken Crispy Ramen</h3><span class="price">₹220</span></div></div></div>
+    <div class="card"><div class="thumb">🍜</div><div class="m"><div class="top"><span class="diet egg"></span><h3>Spicy Korean Paneer Ramen</h3><span class="price">₹200</span></div><div class="tags"><span class="chili">🌶</span></div></div></div>
+  </section>
+
+  <section class="sec" id="combos">
+    <h2>Combos</h2>
+    <p class="blurb">Meal combos served with fries + coke.</p>
+    <div class="card feat"><div class="thumb">🍥</div><div class="m"><div class="top"><span class="diet veg"></span><h3>Maggi Meals</h3><span class="price">₹129</span></div>
+    <div class="desc">Classic maggi + fries + coke. 26g protein.</div>
+    <div class="tags"><span class="sticker red">Highest selling</span><span class="sticker yellow">26g protein</span></div>
+    <div class="opts"><span class="opt">Paneer <b>+₹60</b></span><span class="opt">Popcorn <b>+₹90</b></span><span class="opt">Crispy <b>+₹130</b></span></div></div></div>
+    <div class="card"><div class="thumb">🍕</div><div class="m"><div class="top"><span class="diet veg"></span><h3>Pizza Combo</h3><span class="price">₹269</span></div><div class="desc">1 medium veg pizza + fries + coke.</div><div class="tags"><span class="sticker red">Most ordered</span></div><div class="opts"><span class="opt">Cheese <b>+₹20</b></span><span class="opt">Paneer <b>+₹80</b></span><span class="opt">Chicken <b>+₹100</b></span></div></div></div>
+  </section>
+
+  <section class="sec" id="maggi">
+    <h2>Maggi</h2>
+    <p class="blurb">Homemade recipes perfected over 4 years.</p>
+    <div class="card"><div class="thumb">🍜</div><div class="m"><div class="top"><span class="diet veg"></span><h3>Classic Maggi</h3><span class="price">₹60</span></div></div></div>
+    <div class="card"><div class="thumb">🧈</div><div class="m"><div class="top"><span class="diet veg"></span><h3>Butter Maggi</h3><span class="price">₹80</span></div></div></div>
+    <div class="card"><div class="thumb">🧀</div><div class="m"><div class="top"><span class="diet veg"></span><h3>Cheese Maggi</h3><span class="price">₹120</span></div></div></div>
+    <div class="card"><div class="thumb">🍜</div><div class="m"><div class="top"><span class="diet veg"></span><h3>Paneer Maggi</h3><span class="price">₹140</span></div></div></div>
+    <div class="card"><div class="thumb">🍗</div><div class="m"><div class="top"><span class="diet nonveg"></span><h3>Chicken Maggi</h3><span class="price">₹140</span></div></div></div>
+  </section>
+
+  <footer>
+    <div class="ita">いただきます Itadakimasu!</div>
+    <p><a href="#">@maggilicious_cafe</a> · Zomato 4.2★<br>more new dishes coming soon</p>
+  </footer>
+</div>
+</body>
+</html>

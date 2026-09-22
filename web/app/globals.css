@@ -1,26 +1,511 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* The ONLY colours + fonts in the app. Change them here, everything follows.
+   These generate Tailwind utilities: bg-paper, text-ink, bg-red, border-ink,
+   font-display, font-sans, etc. */
+@theme {
+  --color-paper: #fbf3e7;
+  --color-ink: #141210;
+  --color-red: #ff3b30;
+  --color-yellow: #ffc53d;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-display: var(--font-grotesk), "Space Grotesk", sans-serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  /* halftone dot texture from the design */
+  background-image: radial-gradient(
+    rgba(20, 18, 16, 0.07) 1.2px,
+    transparent 1.3px
+  );
+  background-size: 15px 15px;
+  /* guard against stray horizontal scroll; `clip` (not hidden) keeps sticky nav working */
+  overflow-x: clip;
+}
+
+/* Motion reused across the menu (components just reference these by name) */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes pop {
+  from {
+    transform: scale(0.7) rotate(-4deg);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes bob {
+  50% {
+    transform: translateY(-6px) rotate(-3deg);
+  }
+}
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+@keyframes blink {
+  50% {
+    box-shadow: 0 0 0 6px rgba(255, 59, 48, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+  }
+}
+
+/* ---- menu components (ported from the approved 03 preview) ---- */
+.menu-wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 16px 70px;
+}
+
+.sec {
+  padding: 26px 0 8px;
+}
+.sec h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 32px;
+  text-transform: uppercase;
+  display: inline;
+  line-height: 1;
+  padding: 0 2px;
+  background: linear-gradient(
+    transparent 62%,
+    var(--color-yellow) 62% 92%,
+    transparent 92%
+  );
+}
+.blurb {
+  font-size: 13px;
+  font-weight: 500;
+  margin: 12px 0 18px;
+  opacity: 0.8;
+}
+
+/* dishes flow into as many columns as fit: 1 on phone, up to 3 on desktop */
+.items {
+  display: grid;
+  /* min(280px, 100%) stops the min track width from overflowing narrow phones */
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: 14px;
+  align-items: start;
+}
+.items .card {
+  margin-bottom: 0;
+}
+/* Featured stays a normal grid cell (its red shadow + bigger bobbing thumb make
+   it stand out) instead of stretching full-width and looking empty on desktop.
+   On phones the grid is 1 column, so featured is full-width there anyway. */
+
+.card {
+  background: #fff;
+  border: 2.5px solid var(--color-ink);
+  border-radius: 18px;
+  padding: 12px;
+  margin-bottom: 14px;
+  display: flex;
+  gap: 12px;
+  box-shadow: 4px 4px 0 var(--color-ink);
+  transition:
+    transform 0.14s ease,
+    box-shadow 0.14s ease;
+}
+.card:hover {
+  transform: translate(-3px, -3px) rotate(-0.4deg);
+  box-shadow: 7px 7px 0 var(--color-ink);
+}
+.thumb {
+  flex: 0 0 76px;
+  height: 76px;
+  border-radius: 14px;
+  border: 2.5px solid var(--color-ink);
+  display: grid;
+  place-items: center;
+  font-size: 33px;
+  background: var(--color-yellow);
+}
+.m {
+  flex: 1;
+  min-width: 0;
+}
+.top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.top h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+}
+.price {
+  margin-left: auto;
+  font-family: var(--font-display);
+  font-weight: 700;
+  background: var(--color-ink);
+  color: #fff;
+  padding: 3px 9px;
+  border-radius: 9px;
+  transform: rotate(2deg);
+}
+.desc {
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.8;
+  margin-top: 3px;
+}
+.tags {
+  display: flex;
+  gap: 7px;
+  margin-top: 9px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.sticker {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  border: 2px solid var(--color-ink);
+  border-radius: 8px;
+  padding: 3px 9px;
+  box-shadow: 2px 2px 0 var(--color-ink);
+}
+.sticker.red {
+  background: var(--color-red);
+  color: #fff;
+}
+.sticker.yellow {
+  background: var(--color-yellow);
+}
+.card:hover .sticker {
+  animation: wiggle 0.4s ease;
+}
+
+.feat {
+  border-width: 3px;
+  box-shadow: 6px 6px 0 var(--color-red);
+}
+.feat .thumb {
+  flex-basis: 92px;
+  height: 92px;
+  font-size: 42px;
+  animation: bob 2.6s ease-in-out infinite;
+}
+
+.diet {
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+.diet::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.diet.veg {
+  border: 1.5px solid #2e7d32;
+}
+.diet.veg::before {
+  background: #2e7d32;
+}
+.diet.egg {
+  border: 1.5px solid #e7b416;
+}
+.diet.egg::before {
+  background: #e7b416;
+}
+.diet.nonveg {
+  border: 1.5px solid #c62828;
+}
+.diet.nonveg::before {
+  background: #c62828;
+}
+.chili {
+  font-size: 13px;
+  animation: shake 2s ease-in-out infinite;
+}
+@keyframes shake {
+  0%,
+  90%,
+  100% {
+    transform: rotate(0);
+  }
+  93% {
+    transform: rotate(-12deg);
+  }
+  96% {
+    transform: rotate(12deg);
+  }
+}
+
+.opts {
+  margin-top: 11px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.opt {
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--color-paper);
+  border: 2px solid var(--color-ink);
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+.opt b {
+  color: var(--color-red);
+}
+
+/* ---- page chrome: marquee, hero, sticky nav, footer ---- */
+html {
+  scroll-behavior: smooth;
+}
+.sec {
+  scroll-margin-top: 70px; /* so nav-chip jumps clear the sticky nav bar */
+}
+
+/* marquee ribbon */
+.ribbon {
+  background: var(--color-ink);
+  color: var(--color-paper);
+  overflow: hidden;
+  white-space: nowrap;
+  border-bottom: 2px solid var(--color-ink);
+}
+.ribbon .track {
+  display: inline-block;
+  padding: 9px 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  animation: marquee 18s linear infinite;
+}
+.ribbon .track span {
+  padding: 0 18px;
+}
+.ribbon .track span::after {
+  content: "🍜";
+  padding-left: 18px;
+}
+
+/* hero */
+.hero {
+  position: relative;
+  text-align: center;
+  padding: 34px 0 20px;
+  max-width: 640px; /* keep the stars + title grouped on wide screens */
+  margin-inline: auto;
+}
+.kicker {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--color-yellow);
+  border: 2.5px solid var(--color-ink);
+  border-radius: 9px;
+  padding: 6px 12px;
+  transform: rotate(-2deg);
+  box-shadow: 3px 3px 0 var(--color-ink);
+}
+.hero h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(48px, 15vw, 84px);
+  line-height: 0.9;
+  margin-top: 18px;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+.hero h1 .out {
+  color: var(--color-paper);
+  -webkit-text-stroke: 2.5px var(--color-ink);
+  text-shadow: 5px 5px 0 var(--color-red);
+  animation: pop 0.5s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+.hero p {
+  margin: 14px auto 0;
+  font-size: 15px;
+  font-weight: 500;
+  max-width: 42ch;
+}
+.star {
+  position: absolute;
+  font-size: 24px;
+  color: var(--color-ink);
+  animation: spin 6s linear infinite;
+}
+.star.a {
+  top: 24px;
+  right: 18px;
+}
+.star.b {
+  top: 96px;
+  left: 10px;
+  animation-direction: reverse;
+}
+.tablechip {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 18px;
+  padding: 9px 15px;
+  background: #fff;
+  border: 2.5px solid var(--color-ink);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 4px 4px 0 var(--color-ink);
+}
+.tablechip .pin {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-red);
+  box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.25);
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+/* sticky section nav */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 12px 0;
+  margin-bottom: 6px;
+  background: var(--color-paper);
+  border-bottom: 2.5px solid var(--color-ink);
+  scrollbar-width: none; /* Firefox */
+}
+.nav::-webkit-scrollbar {
+  display: none;
+}
+.nav a {
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--color-ink);
+  text-decoration: none;
+  padding: 8px 15px;
+  border: 2.5px solid var(--color-ink);
+  border-radius: 11px;
+  background: #fff;
+  box-shadow: 2px 2px 0 var(--color-ink);
+  transition: 0.12s;
+}
+.nav a:hover {
+  transform: translateY(-2px);
+  box-shadow: 3px 4px 0 var(--color-ink);
+}
+.nav a.on {
+  background: var(--color-red);
+  color: #fff;
+}
+
+/* footer */
+.foot {
+  text-align: center;
+  padding-top: 44px;
+}
+.foot .ita {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 24px;
+  background: var(--color-yellow);
+  display: inline-block;
+  border: 2.5px solid var(--color-ink);
+  border-radius: 14px;
+  padding: 9px 18px;
+  transform: rotate(-1.5deg);
+  box-shadow: 4px 4px 0 var(--color-ink);
+}
+.foot .links {
+  margin-top: 16px;
+  font-weight: 600;
+  font-size: 13px;
+}
+.foot .links a {
+  color: var(--color-red);
+  font-weight: 700;
+  text-decoration: none;
+}
+.foot .rules {
+  margin: 22px auto 0;
+  max-width: 460px;
+  text-align: left;
+  border: 2px dashed var(--color-ink);
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 12.5px;
+}
+.foot .rules ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.foot .rules h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+.foot .rules li {
+  margin: 4px 0;
+  padding-left: 18px;
+  position: relative;
+  opacity: 0.85;
+}
+.foot .rules li::before {
+  content: "🍥";
+  position: absolute;
+  left: 0;
+  font-size: 11px;
+}
+.foot .soon {
+  margin-top: 16px;
+  opacity: 0.6;
+  font-size: 12px;
 }
