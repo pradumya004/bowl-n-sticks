@@ -112,8 +112,10 @@ Veg/egg/non-veg/spicy tags, combo upgrades, and toppings from the real menu all 
 - [ ] Performance pass → deferred to Phase 7 (pairs with real images in Phase 5). Currently server-rendered, emoji placeholders.
 
 ### Phase 3 — QR Codes
-- [ ] Generate permanent QR PNG/SVG for T1–T4 pointing at `/t/{code}`.
-- [ ] Print-ready sheet (table tents / stickers) for the owners.
+- [x] `/t/[code]` route: scanning a table QR opens the menu with that table in the hero (graceful fallback for unknown codes). `lib/menu.js#getTable`, `app/t/[code]/page.js`, shared `MenuView`. Live + verified (`/t/T1` → 200 "Table 1").
+- [x] QR generator `web/scripts/gen-qr.mjs` (npm `qrcode`): `qr/T1..T4` PNG (1024px) + SVG, brand colours. Encodes `https://bowl-n-sticks.vercel.app/t/<code>`.
+- [x] Print sheet `qr/print.html` (A4, 4 branded cards, "Scan for menu" + table label).
+- [ ] **Before printing for real:** lock the final URL/domain, then re-run `node scripts/gen-qr.mjs <url>` and reprint. Printed QRs break if the domain changes later.
 
 ### Phase 4 — Admin: Auth + Menu Management
 - [ ] Admin login (Supabase Auth).
