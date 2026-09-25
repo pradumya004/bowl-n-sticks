@@ -1,4 +1,4 @@
-import { supabase } from "../lib/supabaseClient";
+import { supabase } from "@/lib/supabase/public";
 
 const CAFE_SLUG = "bowl-n-sticks";
 
@@ -9,7 +9,9 @@ export async function getMenu() {
       .from("cafe")
       .select("name, tagline, timings, socials, rules")
       .eq("slug", CAFE_SLUG)
-      .single(), // exactly one row, returned as an object not an array
+      .maybeSingle(), // one row as an object, or null if the cafe is missing
+      // (maybeSingle, not single, so an empty DB returns null gracefully
+      //  instead of throwing and crashing the build/page)
     supabase
       .from("menu_section")
       .select(

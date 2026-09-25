@@ -1,4 +1,5 @@
 import DietMark from "./DietMark";
+import SpicyMark from "@/components/ui/SpicyMark";
 
 // One dish. Featured items get the bigger red-shadow treatment + floating thumb.
 export default function DishCard({ item }) {
@@ -26,7 +27,7 @@ export default function DishCard({ item }) {
             {item.protein_g && (
               <span className="sticker yellow">{item.protein_g}g protein</span>
             )}
-            {item.is_spicy && <span className="chili">🌶</span>}
+            {item.is_spicy && <SpicyMark />}
           </div>
         )}
 

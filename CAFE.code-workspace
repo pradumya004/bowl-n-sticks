@@ -1,0 +1,18 @@
+{
+  "folders": [
+    { "name": "web (app)", "path": "web" },
+    { "name": "CAFE (root)", "path": "." }
+  ],
+  "settings": {
+    "javascript.suggest.autoImports": true,
+    "typescript.suggest.autoImports": true,
+    "javascript.suggest.completeFunctionCalls": true,
+    "javascript.preferences.importModuleSpecifier": "non-relative",
+    "editor.suggestOnTriggerCharacters": true,
+    "editor.quickSuggestions": {
+      "other": true,
+      "comments": false,
+      "strings": true
+    }
+  }
+}

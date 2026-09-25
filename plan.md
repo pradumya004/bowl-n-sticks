@@ -95,7 +95,7 @@ Veg/egg/non-veg/spicy tags, combo upgrades, and toppings from the real menu all 
 - [x] Scaffold Next.js app, run it locally, see the starter page. → Next 16 (App Router, JS) + Tailwind v4 in `web/`.
 - [x] First commit + push.
 - [x] Connect Vercel to the repo (auto-deploy on push) — Root Directory = `web`. Live URL on Vercel.
-- [x] Create Supabase project (cloud) + save keys in `web/.env.local`. → project ref `bxwfcyhlvfknkpivpjis`, region Mumbai/Singapore, new-style publishable key.
+- [x] Create Supabase project (cloud) + save keys in `web/.env.local`. → project ref `weamsykuzutontupvygy` (personal-account project; the original work-email project was migrated away + deleted on 2026-09-22). New-style publishable key.
 
 ### Phase 1 — Data Model + Real Menu Seed
 - [x] Design the SQL schema in Supabase. → `db/schema.sql` run; 5 tables live (verified via REST API).
@@ -110,6 +110,7 @@ Veg/egg/non-veg/spicy tags, combo upgrades, and toppings from the real menu all 
 - [~] Search + filter: **section jump done** (sticky nav + IntersectionObserver active state). Search + veg-only/spicy filter NOT built yet — decide with owner.
 - [x] Anime/Japanese polish: motion (marquee, pop, wiggle, bob, spin, chili shake), Space Grotesk + Inter, *Itadakimasu*, halftone.
 - [ ] Performance pass → deferred to Phase 7 (pairs with real images in Phase 5). Currently server-rendered, emoji placeholders.
+- [x] **Custom 404 + error pages** → `app/not-found.js` + `app/error.js`. Concept: a kitchen **order slip** for "the page you wanted", stamped **NOT FOUND** in red (stamp-slam animation), giant stroked number, 6 floating stickers, a quip line that cycles through 5 messages in pure CSS (no JS random = no hydration risk), Back-to-menu button. 500 page = same joke, `Status: Burnt`, stamped **REMAKE**. Covers public + admin routes.
 
 ### Phase 3 — QR Codes
 - [x] `/t/[code]` route: scanning a table QR opens the menu with that table in the hero (graceful fallback for unknown codes). `lib/menu.js#getTable`, `app/t/[code]/page.js`, shared `MenuView`. Live + verified (`/t/T1` → 200 "Table 1").
@@ -118,8 +119,8 @@ Veg/egg/non-veg/spicy tags, combo upgrades, and toppings from the real menu all 
 - [ ] **Before printing for real:** lock the final URL/domain, then re-run `node scripts/gen-qr.mjs <url>` and reprint. Printed QRs break if the domain changes later.
 
 ### Phase 4 — Admin: Auth + Menu Management
-- [ ] Admin login (Supabase Auth).
-- [ ] CRUD: sections (add/remove/reorder), items, variants, add-ons.
+- [x] Admin login (Supabase Auth). → `@supabase/ssr` (browser+server clients + `middleware.js` guarding `/admin`), `/admin/login` (email+password), `/admin` home + logout. Signups off; write RLS via `db/admin-policies.sql`. Login loop verified.
+- [ ] CRUD: sections (add/remove/reorder), items, options. ← in progress (Step 5)
 - [ ] Toggle active/featured, edit text & prices, drag-to-reorder.
 
 ### Phase 5 — Admin: Media
@@ -134,6 +135,20 @@ Veg/egg/non-veg/spicy tags, combo upgrades, and toppings from the real menu all 
 - [ ] Custom domain (e.g. maggilicious.com) — optional, when ready.
 - [ ] Caching/ISR so menu is instant; Lighthouse pass.
 - [ ] Backups + basic monitoring.
+
+### Phase 9 — 404 Meme Feed (PARKED, agreed 2026-09-25)
+Owner wants real memes pulled from **subreddits** (not a hand-picked handful) on the 404 page.
+**Key decision: never fetch Reddit at request time** (Reddit rate-limits/403s cloud IPs like Vercel's, deleted posts break images, and it blocks page render). Instead cache into our own DB + Storage and serve random from there.
+- [ ] 1. Owners pick the subreddits (config array, editable anytime).
+- [ ] 2. Reddit **script app** (reddit.com/prefs/apps) → client ID + secret → `.env.local` + Vercel (Type: **Secret**). OAuth is required now; the public `.json` endpoint is throttled/blocked from servers.
+- [ ] 3. `db/memes.sql`: table `meme` (`reddit_id` unique for dedupe, `source_subreddit`, `title`, `permalink`, `author`, `score`, `image_path`, `status` pending/approved/rejected, `created_at`) + RLS (public reads approved only, admin full).
+- [ ] 4. Supabase Storage bucket `memes` (public read) so images are ours and can't 404.
+- [ ] 5. `app/api/cron/fetch-memes/route.js`: OAuth token → top posts per sub → filter (images only, skip `over_18`/`stickied`/`spoiler`, min score, size cap) → dedupe on `reddit_id` → download → upload to Storage → insert as `pending`.
+- [ ] 6. `vercel.json` cron (daily) + `CRON_SECRET` header check.
+- [ ] 7. Admin moderation page `/admin/memes` (Approve/Reject grid, reuses `.btn`/`.pill`/modal). Keeps an NSFW/offensive post off a customer's screen; ~30s a week.
+- [ ] 8. 404 pulls one random **approved** meme server-side (uncached) + small "via r/xyz" credit; falls back to the order-slip art when empty.
+- [ ] 9. Test end to end; 10. log here.
+Effort ~2-3 sessions. Note: memes are third-party content, the approve step + credit keeps it reasonable; don't reuse them in printed menus or paid ads.
 
 ### Phase 8 — Later (post owner discussion)
 - [ ] Order-to-table (kitchen/staff view, realtime).
@@ -186,6 +201,12 @@ Set in `web/.env.local` (local dev) AND in Vercel → Settings → Environment V
 ## 12. Status Log
 
 - **2026-09-21** — Plan created. Scope + stack locked (view-only Phase 1, Next.js + Supabase). Menu PDF parsed (~22 sections).
+- **2026-09-25** — **Admin restructure + UI hardening.** Routes: `/admin` is now the **dashboard**, sections moved to `/admin/sections` + `/admin/sections/[id]`; signed-in pages share `app/admin/(panel)/layout.js` (route group, so `/admin/login` gets no chrome). **Structure rule: `app/` holds routes only** — components live in `components/menu|admin/ui|admin/sections|admin/items|ui`, server actions in `lib/actions/{sections,items,shared}.js`, `lib/supabaseClient.js` renamed `lib/supabase/public.js`. Sidebar rebuilt as an **ink panel** (cream on ink, same pairing as the marquee), grouped nav with Soon badges for unbuilt areas, account + logout moved into it. **Browser-native UI replaced everywhere**: number spinners, checkboxes, `<select>` (now a segmented control), placeholders, selection colour, focus rings, scrollbars, Chrome autofill wash, `title` tooltips. Bugs fixed: missing `?.` on badges parse (would crash the dish form), 5c-ii form CSS never added, `ItemCardActions` imported but not rendered, blurb `-8px` margin overlapping the section title.
+- [ ] **TODO (licensing):** the spicy chilli uses **Twemoji** artwork (CC-BY 4.0) recoloured to brand red — it needs a visible credit (footer or NOTICE), or swap to Noto Emoji (Apache-2.0, no visible credit). Decide before launch.
+- **2026-09-25** — **404 + 500 pages shipped** (`app/not-found.js`, `app/error.js`): kitchen order-slip concept stamped NOT FOUND / REMAKE, floating stickers, CSS-cycled quip lines. Reddit **meme feed parked as Phase 9** with full steps (cache-into-our-DB architecture, not live fetch). Back to Phase 4 item CRUD.
+- **2026-09-25** — **UI consistency pass.** Added a shared design scale in `globals.css` (`--line-sm/--line/--line-lg`, `--sh-sm/--sh/--sh-lg/--sh-xl`, `--r-sm/--r/--r-lg/--r-xl/--r-pill`), values taken from the approved menu design. Collapsed the admin's **6 button styles into ONE `.btn`** (variants `--sm --primary --danger --accent --block --icon`) and **4 pill styles into ONE `.pill`** (`--yellow --red --ink --round --tilt`), plus one shared `.admin-field` for inputs + textareas. Deleted every one-off class (`admin-kicker/submit/newbtn/logout`, `modal-x/kicker`, `sec-btn`, `sec-card-count/off`). Admin item price now uses the same ink pill as the menu. **Customer menu untouched.** Lint clean. Next: custom 404/error page.
+- **2026-09-22** — **Supabase migrated to a personal-account project** (`weamsykuzutontupvygy`) after finding the old project was under the work email. Old project/account deleted. Rebuild = re-run `db/schema.sql` + `db/seed.sql`; update `NEXT_PUBLIC_SUPABASE_*` in `web/.env.local` + Vercel with the new URL + new publishable key; redeploy. QRs unaffected (point at vercel.app). VERIFIED clean: new-project row counts match, live deploy green, all 4 table routes render correct labels, no legacy refs/keys in code.
+- **2026-09-22** — **Phase 3 DONE.** `/t/[code]` route live (all T1-T4 verified 200 + correct label), QR generator + `qr/*` images + `qr/print.html` print sheet. Scan-to-menu confirmed working on a real phone. QRs point at vercel.app (regenerate before physical print if a custom domain is chosen). Next: Phase 4 admin (auth + menu management).
 - **2026-09-22** — **Phase 2 DONE + LIVE.** Added the two `NEXT_PUBLIC_SUPABASE_*` vars to Vercel (type: Config) and redeployed; live at https://bowl-n-sticks.vercel.app. Desktop responsiveness fixed (footer rules 2-col, blurb width, grid overflow, featured cells). Starting Phase 3 (QR + per-table route), back to side-by-side.
 - **2026-09-22** — **Phase 2 customer menu UI built.** `app/page.js` renders the live menu: Marquee, Hero (brand name from DB), sticky SectionNav (client, IntersectionObserver), DishCard (diet mark, stickers, protein, options), Footer (socials + rules). Responsive grid (1/2/3 cols, featured full-width). Palette/fonts as `@theme` tokens in `globals.css`; card/chrome CSS ported from approved `03-manga-plus`. Lint clean. Remaining: search + veg/spicy filter (deferred, ask owner), Lottie, real photos (Phase 5), Vercel env vars for live deploy.
 - **2026-09-21** — **Phase 1 COMPLETE.** `@supabase/supabase-js` installed; `web/lib/supabaseClient.js` created; `app/page.js` test fetch renders all sections + items end to end. Next: Phase 2 (customer menu UI + design direction).

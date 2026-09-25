@@ -1,5 +1,5 @@
 import { getMenu, getTable } from "@/lib/menu";
-import MenuView from "@/app/components/MenuView";
+import MenuView from "@/components/menu/MenuView";
 
 export default async function TablePage({ params }) {
   // params is async and must be awaited before use. It comes from the dynamic route segment [code] in the file path.

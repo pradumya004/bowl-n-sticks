@@ -13,6 +13,27 @@
   --font-sans: var(--font-inter), system-ui, sans-serif;
 }
 
+/* ---- design scale ----
+   One set of border widths, hard-shadow offsets and radii, taken from the
+   approved menu design. Everything (admin included) uses these, so nothing
+   drifts into one-off values again. */
+:root {
+  --line-sm: 2px; /* small chips: pills, stickers */
+  --line: 2.5px; /* default: cards, buttons, inputs */
+  --line-lg: 3px; /* emphasis: modals, featured cards */
+
+  --sh-sm: 2px 2px 0 var(--color-ink);
+  --sh: 4px 4px 0 var(--color-ink);
+  --sh-lg: 6px 6px 0 var(--color-ink);
+  --sh-xl: 8px 8px 0 var(--color-ink);
+
+  --r-sm: 9px;
+  --r: 12px;
+  --r-lg: 18px;
+  --r-xl: 20px;
+  --r-pill: 999px;
+}
+
 body {
   background-color: var(--color-paper);
   color: var(--color-ink);
@@ -254,9 +275,10 @@ body {
 .diet.nonveg::before {
   background: #c62828;
 }
-.chili {
-  font-size: 13px;
+.spicy-mark {
+  flex: 0 0 auto;
   animation: shake 2s ease-in-out infinite;
+  transform-origin: 80% 20%;
 }
 @keyframes shake {
   0%,
@@ -513,4 +535,1156 @@ html {
   margin-top: 16px;
   opacity: 0.6;
   font-size: 12px;
+}
+
+/* ---- shared UI system: ONE button + ONE pill, reused across the admin ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  text-decoration: none;
+  background: #fff;
+  color: var(--color-ink);
+  border: var(--line) solid var(--color-ink);
+  border-radius: var(--r);
+  padding: 10px 16px;
+  box-shadow: var(--sh);
+  cursor: pointer;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+.btn:hover:not(:disabled) {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--sh-lg);
+}
+.btn:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: var(--sh-sm);
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+  transform: none;
+}
+.btn--sm {
+  font-size: 11px;
+  padding: 6px 11px;
+  border-width: var(--line-sm);
+  border-radius: var(--r-sm);
+  box-shadow: var(--sh-sm);
+}
+.btn--sm:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--sh);
+}
+.btn--primary,
+.btn--danger {
+  background: var(--color-red);
+  color: #fff;
+}
+.btn--accent {
+  background: var(--color-yellow);
+}
+.btn--block {
+  width: 100%;
+}
+.btn--icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-width: var(--line-sm);
+  border-radius: var(--r-sm);
+  box-shadow: var(--sh-sm);
+}
+
+.pill {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  background: #fff;
+  color: var(--color-ink);
+  border: var(--line-sm) solid var(--color-ink);
+  border-radius: var(--r-sm);
+  padding: 3px 9px;
+}
+.pill--yellow {
+  background: var(--color-yellow);
+}
+.pill--red {
+  background: var(--color-red);
+  color: #fff;
+}
+.pill--ink {
+  background: var(--color-ink);
+  color: #fff;
+}
+.pill--round {
+  border-radius: var(--r-pill);
+  padding: 4px 11px;
+}
+.pill--tilt {
+  transform: rotate(-2deg);
+  box-shadow: var(--sh-sm);
+}
+
+/* shared form field, used by the login form and every modal */
+.admin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.admin-field > span {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.admin-field > span em {
+  font-style: normal;
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0.55;
+}
+.admin-field input,
+.admin-field textarea {
+  width: 100%;
+  background: var(--color-paper);
+  border: var(--line) solid var(--color-ink);
+  border-radius: var(--r);
+  padding: 11px 13px;
+  font: inherit;
+  color: var(--color-ink);
+  transition:
+    box-shadow 0.12s ease,
+    border-color 0.12s ease;
+}
+.admin-field textarea {
+  resize: vertical;
+}
+.admin-field input:focus,
+.admin-field textarea:focus {
+  outline: none;
+  border-color: var(--color-red);
+  box-shadow: 3px 3px 0 var(--color-red);
+}
+
+/* ---- admin: login ---- */
+.admin-auth {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: clamp(16px, 5vw, 40px);
+}
+.admin-card {
+  width: 100%;
+  max-width: 400px;
+  background: #fff;
+  border: var(--line-lg) solid var(--color-ink);
+  border-radius: var(--r-xl);
+  box-shadow: 8px 8px 0 var(--color-red);
+  padding: clamp(20px, 5vw, 32px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.admin-card .pill {
+  align-self: flex-start;
+}
+.admin-brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(30px, 8vw, 40px);
+  line-height: 0.95;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  margin-top: 4px;
+}
+.admin-brand .out,
+.admin-brandmark .out {
+  color: var(--color-paper);
+  -webkit-text-stroke: 2px var(--color-ink);
+  text-shadow: 3px 3px 0 var(--color-red);
+}
+.admin-sub {
+  font-size: 13.5px;
+  font-weight: 500;
+  opacity: 0.75;
+  margin-top: -4px;
+}
+.admin-error {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-red);
+  border: var(--line) solid var(--color-ink);
+  border-radius: var(--r);
+  padding: 9px 12px;
+  box-shadow: var(--sh-sm);
+}
+
+/* ---- admin: home ---- */
+/* Full-width app shell: sidebar pinned to the left edge, content fills the rest.
+   (The customer menu stays a centred 1080px column; an admin tool should not.) */
+.admin-app {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100dvh;
+}
+.admin-sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 20px 16px;
+  overflow-y: auto;
+  background: #fff;
+  border-right: var(--line-lg) solid var(--color-ink);
+}
+.admin-brandmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1.15;
+  padding-right: 4px;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  color: inherit;
+}
+.admin-main {
+  min-width: 0;
+  padding: clamp(20px, 3vw, 30px) clamp(16px, 3vw, 30px) 70px;
+}
+/* account block sits at the bottom of the sidebar */
+.admin-account {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+  padding-top: 14px;
+  border-top: var(--line-sm) dashed var(--color-ink);
+}
+.admin-account .who-email {
+  max-width: 100%;
+}
+.admin-account .btn {
+  width: 100%;
+}
+/* the email chip is a .pill, just not shouty */
+.who-email {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  max-width: 60vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.admin-panel {
+  background: #fff;
+  border: var(--line) solid var(--color-ink);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh);
+  padding: 20px;
+  font-size: 14px;
+}
+
+/* admin: sections grid */
+.admin-secthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.admin-secthead h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.admin-secthead h2 .pill {
+  margin-left: 8px;
+  font-size: 12px;
+}
+.admin-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+  gap: 14px;
+}
+.sec-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 116px;
+  background: #fff;
+  border: var(--line) solid var(--color-ink);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh);
+  padding: 16px;
+  transition:
+    transform 0.14s ease,
+    box-shadow 0.14s ease;
+}
+.sec-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--sh-lg);
+}
+.sec-card.is-off {
+  opacity: 0.55;
+}
+.sec-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.sec-card-top h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.15;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.sec-card-top .pill {
+  flex: 0 0 auto;
+}
+.sec-card-blurb {
+  font-size: 12.5px;
+  opacity: 0.7;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.sec-card-foot {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+.sec-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+/* ---- admin: modals (add / edit / confirm) ---- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(20, 18, 16, 0.55);
+  display: grid;
+  place-items: center;
+  padding: clamp(14px, 4vw, 32px);
+  animation: fade 0.12s ease;
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.modal-card {
+  width: 100%;
+  max-width: 460px;
+  max-height: 88dvh;
+  overflow-y: auto;
+  background: #fff;
+  border: 3px solid var(--color-ink);
+  border-radius: 20px;
+  box-shadow: 8px 8px 0 var(--color-ink);
+  padding: clamp(18px, 4vw, 26px);
+  animation: popin 0.16s cubic-bezier(0.2, 1.3, 0.4, 1);
+}
+@keyframes popin {
+  from {
+    transform: scale(0.94) translateY(6px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+.modal-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.modal-headings {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+.modal-head h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 21px;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.modal-head .btn--icon {
+  flex: 0 0 auto;
+}
+.modal-head .btn--icon:hover {
+  background: var(--color-yellow);
+}
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+.modal-warn {
+  font-size: 13.5px;
+  line-height: 1.5;
+  background: var(--color-paper);
+  border: var(--line-sm) dashed var(--color-ink);
+  border-radius: var(--r);
+  padding: 12px 14px;
+}
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+.sec-link {
+  color: inherit;
+  text-decoration: none;
+}
+.sec-link:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+.admin-back {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.modal-card {
+  border-width: var(--line-lg);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-xl);
+}
+.admin-sectionblurb {
+  font-size: 13.5px;
+  opacity: 0.75;
+  max-width: 62ch;
+  margin: 8px 0 20px;
+}
+.admin-back {
+  margin-bottom: 2px;
+}
+.item-name {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.item-tags {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+/* ---- 404 / error pages: a kitchen order slip stamped NOT FOUND ---- */
+.oops {
+  position: relative;
+  min-height: 82dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 16px;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: clamp(26px, 6vw, 52px) 18px 80px;
+}
+
+/* the giant stroked number */
+.oops-code {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(96px, 30vw, 200px);
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+}
+.oops-code--sm {
+  font-size: clamp(78px, 24vw, 160px);
+}
+.oops-code .out {
+  display: inline-block;
+  color: var(--color-paper);
+  -webkit-text-stroke: 4px var(--color-ink);
+  text-shadow: 9px 9px 0 var(--color-red);
+  animation: pop 0.5s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+/* the order slip */
+.oops-slip {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  background: #fff;
+  border: var(--line-lg) solid var(--color-ink);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-xl);
+  padding: 15px 18px 18px;
+  transform: rotate(-1.5deg);
+  text-align: left;
+}
+.oops-slip-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding-bottom: 10px;
+  border-bottom: var(--line-sm) dashed var(--color-ink);
+}
+.oops-slip-rows {
+  margin: 12px 0 0;
+  display: grid;
+  gap: 9px;
+}
+.oops-slip-rows > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.oops-slip-rows dt {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.55;
+}
+.oops-slip-rows dd {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-align: right;
+}
+.oops-stamp {
+  position: absolute;
+  right: 12px;
+  bottom: 40px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(19px, 5.5vw, 25px);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-red);
+  border: 3px solid var(--color-red);
+  border-radius: 8px;
+  padding: 4px 10px;
+  opacity: 0.92;
+  animation: stamp 0.45s cubic-bezier(0.2, 1.6, 0.4, 1) 0.4s both;
+}
+@keyframes stamp {
+  from {
+    transform: rotate(-14deg) scale(2.6);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(-14deg) scale(1);
+    opacity: 0.92;
+  }
+}
+.oops-slip-foot {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: var(--line-sm) dashed var(--color-ink);
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* stickers scattered around the slip */
+.oops-sticker {
+  position: absolute;
+  font-size: clamp(22px, 6vw, 34px);
+  pointer-events: none;
+  user-select: none;
+}
+.oops-sticker.s1 {
+  top: 5%;
+  left: 5%;
+  animation: bob 3.2s ease-in-out infinite;
+}
+.oops-sticker.s2 {
+  top: 11%;
+  right: 7%;
+  animation: spin 7s linear infinite;
+}
+.oops-sticker.s3 {
+  bottom: 21%;
+  left: 8%;
+  animation: wiggle 2.2s ease-in-out infinite;
+}
+.oops-sticker.s4 {
+  bottom: 15%;
+  right: 10%;
+  animation: bob 2.6s ease-in-out infinite;
+}
+.oops-sticker.s5 {
+  top: 45%;
+  left: 1%;
+  animation: spin 9s linear infinite reverse;
+}
+.oops-sticker.s6 {
+  top: 39%;
+  right: 1%;
+  animation: wiggle 2.8s ease-in-out infinite;
+}
+@media (max-width: 430px) {
+  .oops-sticker.s5,
+  .oops-sticker.s6 {
+    display: none;
+  }
+}
+
+/* The quip cycles through all 5 lines in pure CSS (no client JS, no random
+   value that could differ between server and browser). */
+.oops-quips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  width: 100%;
+  height: 2.6em;
+}
+.oops-quips li {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(18px, 5vw, 24px);
+  line-height: 1.2;
+  animation: quipCycle 13s infinite; /* 5 lines x 2.6s each */
+}
+.oops-quips li span {
+  padding: 0 4px;
+  background: linear-gradient(
+    transparent 58%,
+    var(--color-yellow) 58% 94%,
+    transparent 94%
+  );
+}
+@keyframes quipCycle {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  2%,
+  18% {
+    opacity: 1;
+    transform: none;
+  }
+  20%,
+  100% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .oops-quips li:first-child {
+    opacity: 1;
+  }
+}
+
+.oops-sub {
+  font-size: 14px;
+  opacity: 0.75;
+  max-width: 42ch;
+}
+.oops-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ---- admin: dish form controls ---- */
+.admin-row2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr));
+  gap: 13px;
+}
+.admin-checks {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.admin-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #fff;
+  border: var(--line-sm) solid var(--color-ink);
+  border-radius: var(--r-sm);
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.admin-check input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-red);
+  cursor: pointer;
+}
+
+/* ---- admin: dashboard stat cards + section heading ---- */
+.stat-card {
+  text-decoration: none;
+  color: inherit;
+  justify-content: flex-start;
+  gap: 4px;
+}
+.stat-num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 38px;
+  line-height: 1;
+}
+.stat-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.stat-go {
+  margin-top: auto;
+  font-size: 12px;
+  opacity: 0.6;
+}
+.admin-sectiontitle {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(18px, 5vw, 22px);
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  min-width: 0;
+}
+.item-tags {
+  margin-top: 2px;
+}
+
+/* ---- admin: sidebar navigation ---- */
+.admin-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.nav-group-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.45;
+  padding: 0 11px;
+  margin-bottom: 3px;
+}
+/* flat rows, not stacked buttons: only the ACTIVE row gets the red + shadow */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: inherit;
+  text-decoration: none;
+  padding: 9px 11px;
+  border: var(--line-sm) solid transparent;
+  border-radius: var(--r-sm);
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease;
+}
+.nav-item:hover:not(.is-soon) {
+  background: var(--color-paper);
+  border-color: var(--color-ink);
+}
+.nav-item.is-on {
+  background: var(--color-red);
+  color: #fff;
+  border-color: var(--color-ink);
+  box-shadow: var(--sh-sm);
+}
+.nav-item.is-soon {
+  opacity: 0.45;
+  cursor: default;
+}
+.nav-ico {
+  font-size: 14px;
+  line-height: 1;
+}
+.nav-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nav-soon {
+  font-size: 9px;
+  padding: 2px 6px;
+  letter-spacing: 0.06em;
+}
+
+/* below 860px the sidebar folds into a scrollable strip across the top */
+@media (max-width: 860px) {
+  .admin-app {
+    grid-template-columns: 1fr;
+  }
+  .admin-sidebar {
+    position: static;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 12px 16px;
+    border-right: none;
+    border-bottom: var(--line-lg) solid var(--color-ink);
+  }
+  .admin-sidebar::-webkit-scrollbar {
+    display: none;
+  }
+  .admin-side {
+    flex-direction: row;
+    gap: 8px;
+  }
+  .nav-group {
+    flex-direction: row;
+    gap: 6px;
+  }
+  .nav-group-label,
+  .nav-item.is-soon {
+    display: none; /* keep the mobile strip short */
+  }
+  .admin-account {
+    margin-top: 0;
+    margin-left: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding-top: 0;
+    border-top: none;
+  }
+  .admin-account .btn {
+    width: auto;
+  }
+  .admin-brandmark {
+    white-space: nowrap;
+    font-size: 17px;
+  }
+}
+
+/* ---- admin fixes: overflow + small-screen card actions ---- */
+/* the sidebar wordmark uses the shared .out stroke, which is sized for the
+   giant hero number; scale it down here so the letters stay readable */
+.admin-brandmark .out {
+  -webkit-text-stroke-width: 1.5px;
+  text-shadow: 2px 2px 0 var(--color-red);
+}
+.admin-sidebar,
+.admin-account {
+  min-width: 0;
+}
+/* three action buttons don't fit side by side on a narrow card: give them the
+   full row and equal widths instead of letting them wrap raggedly */
+@media (max-width: 560px) {
+  .sec-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+  .sec-actions .btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* emoji inside a pill must not render as a tiny smudge */
+.pill .emoji {
+  font-size: 13px;
+  line-height: 1;
+}
+.admin-check .emoji {
+  font-size: 15px;
+  line-height: 1;
+}
+
+/* ---- segmented control (diet type) ---- */
+.seg-field {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.seg-field legend {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0;
+  margin-bottom: 6px;
+}
+.seg-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.seg-opt {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+/* the real radio stays focusable but invisible; .seg-face is what you see */
+.seg-opt input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.seg-face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: var(--color-paper);
+  border: var(--line) solid var(--color-ink);
+  border-radius: var(--r);
+  padding: 10px 12px;
+  cursor: pointer;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    background 0.12s ease;
+}
+.seg-opt:hover .seg-face {
+  background: #fff;
+}
+.seg-opt input:checked + .seg-face {
+  background: var(--color-ink);
+  color: #fff;
+  box-shadow: var(--sh-sm);
+}
+.seg-opt input:focus-visible + .seg-face {
+  border-color: var(--color-red);
+  box-shadow: 3px 3px 0 var(--color-red);
+}
+
+/* ================= browser-native overrides =================
+   Anything the browser draws itself looks like the OS, not like us. */
+
+/* number inputs: kill the little spinner arrows */
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* placeholder + text selection + focus ring */
+::placeholder {
+  color: var(--color-ink);
+  opacity: 0.38;
+}
+::selection {
+  background: var(--color-yellow);
+  color: var(--color-ink);
+}
+:focus-visible {
+  outline: 3px solid var(--color-red);
+  outline-offset: 2px;
+}
+
+/* Chrome paints autofilled fields pale yellow; repaint them as ours */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-ink);
+  -webkit-box-shadow: 0 0 0 1000px var(--color-paper) inset;
+  caret-color: var(--color-ink);
+}
+
+/* scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-ink) transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-ink);
+  border: 2px solid var(--color-paper);
+  border-radius: var(--r-pill);
+}
+
+/* real checkbox instead of the OS one */
+.admin-check input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: var(--line-sm) solid var(--color-ink);
+  border-radius: 5px;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.admin-check input:checked {
+  background: var(--color-red);
+}
+.admin-check input:checked::after {
+  content: "✓";
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* ================= sidebar: ink panel =================
+   Cream-on-ink, same pairing as the menu's marquee ribbon, so the nav reads as
+   chrome and the content area stays the bright cream workspace. */
+.admin-sidebar {
+  background: var(--color-ink);
+  color: var(--color-paper);
+  border-right: 0;
+}
+.admin-brandmark {
+  color: var(--color-paper);
+}
+/* Same brand device as the menu wordmark (hollow letters + red offset shadow),
+   inverted for the dark panel: the fill matches the sidebar so the letters read
+   as an outline, and the stroke goes cream instead of ink. */
+.admin-brandmark .out {
+  color: var(--color-yellow);
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+}
+.nav-group-label {
+  color: var(--color-paper);
+  opacity: 0.45;
+}
+.nav-item {
+  color: var(--color-paper);
+}
+.nav-item:hover:not(.is-soon) {
+  background: rgba(251, 243, 231, 0.1);
+  border-color: transparent;
+}
+.nav-item.is-on {
+  background: var(--color-red);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: none;
+}
+.nav-item.is-soon {
+  opacity: 0.4;
+}
+/* fixed-width icon column so the labels line up instead of stepping raggedly */
+.nav-ico {
+  width: 18px;
+  flex: 0 0 18px;
+  text-align: center;
+  font-size: 15px;
+}
+.admin-account {
+  border-top-color: rgba(251, 243, 231, 0.25);
+}
+.admin-account .who-email {
+  background: transparent;
+  color: var(--color-paper);
+  border-color: rgba(251, 243, 231, 0.4);
+}
+.admin-account .btn {
+  background: var(--color-yellow);
+  color: var(--color-ink);
+  border-color: var(--color-ink);
+  box-shadow: none;
+}
+.admin-account .btn:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 2px 2px 0 rgba(251, 243, 231, 0.5);
 }

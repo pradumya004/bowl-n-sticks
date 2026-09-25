@@ -1,5 +1,5 @@
 import { getMenu } from "@/lib/menu";
-import MenuView from "./components/MenuView";
+import MenuView from "@/components/menu/MenuView";
 
 export default async function Home() {
   const { cafe, sections } = await getMenu();
