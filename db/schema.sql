@@ -1,4 +1,7 @@
 -- Bowl n Sticks - DB schema
+-- Supabase SQL Editor · Name: "01 - init schema"
+-- Description: Creates the diet_type enum, the menu tables, the updated_at
+-- triggers, and the public read-only RLS policies. Run FIRST on a new project.
 -- ─────────────────────────────────────────────────────────────
 -- Enum: a dish's diet type - veg/egg/non-veg.
 -- Postgres does not have a "CREATE TYPE IF NOT EXISTS", so we wrap it up
@@ -39,6 +42,11 @@ create table if not exists menu_section (
   cafe_id uuid not null references cafe (id) on delete cascade, -- delete a cafe -> its sections go too
   name text not null,
   blurb text, -- the small description under a section title
+  -- URL key for the admin panel, derived from name. Generated: never written to
+  -- directly, recomputed by Postgres whenever the section is renamed.
+  slug text generated always as (
+    trim(both '-' from regexp_replace(lower(name), '[^a-z0-9]+', '-', 'g'))
+  ) stored,
   sort_order int not null default 0, -- controls display order (low first)
   active boolean not null default true,
   created_at timestamptz not null default now(),
@@ -47,6 +55,10 @@ create table if not exists menu_section (
 
 -- Index: speeds up "get a cafe's sections in display order"
 create index if not exists menu_section_cafe_order_idx on menu_section (cafe_id, sort_order);
+
+-- Index: slug is the admin URL key. Unique per cafe, not globally, so two
+-- branches can each have their own "ramen-dishes".
+create unique index if not exists menu_section_cafe_slug_idx on menu_section (cafe_id, slug);
 
 -- ─────────────────────────────────────────────────────────────
 -- menu_item - a dish

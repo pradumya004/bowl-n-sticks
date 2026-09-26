@@ -6,14 +6,26 @@ import { createSection } from "@/lib/actions/sections";
 // "+ New section" button that opens a proper form modal (name + description).
 export default function AddSectionButton() {
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState(null);
   const [pending, startTransition] = useTransition();
+
+  function close() {
+    setError(null);
+    setOpen(false);
+  }
 
   function handleSubmit(e) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     startTransition(async () => {
-      await createSection(formData);
-      setOpen(false);
+      // Only close on a confirmed save - otherwise the form vanishes and takes
+      // whatever was typed with it.
+      const message = await createSection(formData);
+      if (message) {
+        setError(message);
+        return;
+      }
+      close();
     });
   }
 
@@ -23,7 +35,7 @@ export default function AddSectionButton() {
         + New section
       </button>
 
-      <Modal open={open} onClose={() => setOpen(false)} kicker="🍜 New" title="Add a section">
+      <Modal open={open} onClose={close} kicker="🍜 New" title="Add a section">
         <form className="modal-form" onSubmit={handleSubmit}>
           <label className="admin-field">
             <span>Name</span>
@@ -42,8 +54,10 @@ export default function AddSectionButton() {
             />
           </label>
 
+          {error && <p className="admin-error">{error}</p>}
+
           <div className="modal-actions">
-            <button type="button" className="btn" onClick={() => setOpen(false)}>
+            <button type="button" className="btn" onClick={close}>
               Cancel
             </button>
             <button type="submit" className="btn btn--primary" disabled={pending}>

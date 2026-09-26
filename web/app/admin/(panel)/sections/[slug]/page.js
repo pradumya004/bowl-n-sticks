@@ -3,11 +3,12 @@ import { notFound } from "next/navigation";
 import { getAdminSection } from "@/lib/adminMenu";
 import AddItemButton from "@/components/admin/items/AddItemButton";
 import ItemCardActions from "@/components/admin/items/ItemCardActions";
+import OptionsButton from "@/components/admin/options/OptionsButton";
 import SpicyMark from "@/components/ui/SpicyMark";
 
 export default async function SectionItemsPage({ params }) {
-  const { id } = await params;
-  const section = await getAdminSection(id);
+  const { slug } = await params;
+  const section = await getAdminSection(slug);
   if (!section) notFound();
 
   return (
@@ -33,10 +34,16 @@ export default async function SectionItemsPage({ params }) {
 
       <ul className="admin-grid">
         {section.items.map((item) => (
-          <li key={item.id} className={`sec-card ${item.active ? "" : "is-off"}`}>
+          <li
+            key={item.id}
+            className={`sec-card ${item.active ? "" : "is-off"}`}
+          >
             <div className="sec-card-top">
               <h3 className="item-name">
-                <span className={`diet ${item.diet_type}`} aria-label={item.diet_type} />
+                <span
+                  className={`diet ${item.diet_type}`}
+                  aria-label={item.diet_type}
+                />
                 {item.name}
               </h3>
               <span className="pill pill--ink">
@@ -44,19 +51,30 @@ export default async function SectionItemsPage({ params }) {
               </span>
             </div>
 
-            {item.description && <p className="sec-card-blurb">{item.description}</p>}
+            {item.description && (
+              <p className="sec-card-blurb">{item.description}</p>
+            )}
 
             <div className="item-tags">
-              {item.is_featured && <span className="pill pill--red">Featured</span>}
+              {item.is_featured && (
+                <span className="pill pill--red">Featured</span>
+              )}
               {item.badges?.map((b) => (
-                <span key={b} className="pill pill--yellow">{b}</span>
+                <span key={b} className="pill pill--yellow">
+                  {b}
+                </span>
               ))}
-              {item.protein_g && <span className="pill pill--yellow">{item.protein_g}g protein</span>}
+              {item.protein_g != null && (
+                <span className="pill pill--yellow">
+                  {item.protein_g}g protein
+                </span>
+              )}
               {item.is_spicy && <SpicyMark />}
               {!item.active && <span className="pill pill--ink">Hidden</span>}
             </div>
 
             <div className="sec-card-foot">
+              <OptionsButton item={item} />
               <ItemCardActions item={item} />
             </div>
           </li>

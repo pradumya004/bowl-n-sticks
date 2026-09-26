@@ -1,6 +1,9 @@
 "use server";
 import { createClient } from "@/lib/supabase/server";
-import { refreshMenu } from "./shared";
+import { refreshMenu, dbFailure } from "./shared";
+
+// Each action returns the reason it failed, or nothing at all on success.
+const GONE = "That dish no longer exists. Refresh the page.";
 
 // Shared parsing for the dish form (used by create + update).
 // Not exported: a "use server" file may only export async functions.
@@ -25,25 +28,43 @@ function itemFromForm(formData) {
   };
 }
 
+// Why the dish can't be saved, or null. Number() turns junk into NaN, which
+// Postgres would reject with a message nobody can read.
+function itemProblem(fields) {
+  if (!fields.name) return "Name is required.";
+  if (fields.price !== null && !(Number.isFinite(fields.price) && fields.price >= 0)) {
+    return "Price must be a number (or leave it blank for MRP).";
+  }
+  if (fields.protein_g !== null && !(Number.isFinite(fields.protein_g) && fields.protein_g >= 0)) {
+    return "Protein must be a number (or leave it blank).";
+  }
+  return null;
+}
+
 export async function createItem(formData) {
   const supabase = await createClient();
   const sectionId = formData.get("menu_section_id")?.toString();
   const fields = itemFromForm(formData);
-  if (!sectionId || !fields.name) return;
+  if (!sectionId) return "Missing section id.";
+  const problem = itemProblem(fields);
+  if (problem) return problem;
 
-  const { data: last } = await supabase
+  const { data: last, error: lastError } = await supabase
     .from("menu_item")
     .select("sort_order")
     .eq("menu_section_id", sectionId)
     .order("sort_order", { ascending: false })
     .limit(1)
     .maybeSingle();
+  if (lastError) return dbFailure("createItem/sort_order", lastError);
 
-  await supabase.from("menu_item").insert({
+  const { error } = await supabase.from("menu_item").insert({
     ...fields,
     menu_section_id: sectionId,
     sort_order: (last?.sort_order ?? 0) + 1,
   });
+  if (error) return dbFailure("createItem", error);
+
   refreshMenu();
 }
 
@@ -51,9 +72,20 @@ export async function updateItem(formData) {
   const supabase = await createClient();
   const id = formData.get("id")?.toString();
   const fields = itemFromForm(formData);
-  if (!id || !fields.name) return;
+  if (!id) return "Missing dish id.";
+  const problem = itemProblem(fields);
+  if (problem) return problem;
 
-  await supabase.from("menu_item").update(fields).eq("id", id);
+  // .select("id") so we can tell a real update from one that matched no rows -
+  // without it, editing a dish someone else deleted reports success.
+  const { data, error } = await supabase
+    .from("menu_item")
+    .update(fields)
+    .eq("id", id)
+    .select("id");
+  if (error) return dbFailure("updateItem", error);
+  if (!data?.length) return GONE;
+
   refreshMenu();
 }
 
@@ -61,17 +93,31 @@ export async function toggleItem(formData) {
   const supabase = await createClient();
   const id = formData.get("id")?.toString();
   const active = formData.get("active") === "true";
-  if (!id) return;
+  if (!id) return "Missing dish id.";
 
-  await supabase.from("menu_item").update({ active: !active }).eq("id", id);
+  const { data, error } = await supabase
+    .from("menu_item")
+    .update({ active: !active })
+    .eq("id", id)
+    .select("id");
+  if (error) return dbFailure("toggleItem", error);
+  if (!data?.length) return GONE;
+
   refreshMenu();
 }
 
 export async function deleteItem(formData) {
   const supabase = await createClient();
   const id = formData.get("id")?.toString();
-  if (!id) return;
+  if (!id) return "Missing dish id.";
 
-  await supabase.from("menu_item").delete().eq("id", id); // cascades to its options
+  const { data, error } = await supabase
+    .from("menu_item")
+    .delete()
+    .eq("id", id)
+    .select("id"); // cascades to its options
+  if (error) return dbFailure("deleteItem", error);
+  if (!data?.length) return "That dish was already deleted.";
+
   refreshMenu();
 }

@@ -1,4 +1,8 @@
 -- Bowl n Sticks - admin write access (Phase 4)
+-- Supabase SQL Editor · Name: "03 - admin write policies"
+-- Description: Grants authenticated (logged-in) users full read + write RLS on
+-- every menu table. Public anon stays read-only-active.
+--
 -- Run in the Supabase SQL Editor after schema + seed.
 --
 -- Gives any LOGGED-IN (authenticated) user full read + write on every menu

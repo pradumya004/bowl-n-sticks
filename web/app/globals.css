@@ -897,6 +897,11 @@ html {
   margin-left: auto;
   flex-wrap: wrap;
 }
+/* a failed Hide/Show on a card: own full-width line under the buttons */
+.sec-error {
+  flex-basis: 100%;
+  margin: 0;
+}
 
 /* ---- admin: modals (add / edit / confirm) ---- */
 .modal-backdrop {
@@ -1687,4 +1692,95 @@ input:-webkit-autofill:focus {
 .admin-account .btn:hover:not(:disabled) {
   transform: translate(-1px, -1px);
   box-shadow: 2px 2px 0 rgba(251, 243, 231, 0.5);
+}
+
+/* ---- admin: dish options (inside the Options modal) ---- */
+.opt-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.opt-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: var(--color-paper);
+  border: var(--line-sm) solid var(--color-ink);
+  border-radius: var(--r);
+  padding: 8px 10px;
+}
+.opt-row--form {
+  display: block;
+  background: transparent;
+  border-style: dashed;
+}
+.opt-label {
+  flex: 1;
+  min-width: 120px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.opt-acts {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+.opt-ask {
+  font-size: 13px;
+  font-weight: 700;
+}
+.opt-row .admin-error {
+  flex-basis: 100%;
+}
+.opt-add {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: var(--line-sm) dashed var(--color-ink);
+  padding-top: 14px;
+}
+.opt-addtitle {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* icon inside a 32x32 icon button */
+.btn--icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* "3 options" chip: lives with the dish badges, reads as a pill but clicks */
+.opt-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  background: transparent;
+  color: var(--color-ink);
+  border: var(--line-sm) dashed var(--color-ink);
+  border-radius: var(--r-pill);
+  padding: 3px 10px;
+  cursor: pointer;
+}
+.opt-chip svg {
+  width: 14px;
+  height: 14px;
+}
+.opt-chip:hover {
+  background: var(--color-yellow);
+  border-style: solid;
+  box-shadow: var(--sh-sm);
 }

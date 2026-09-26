@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase/public";
+import { logData } from "@/lib/debug";
 
 const CAFE_SLUG = "bowl-n-sticks";
 
@@ -32,6 +33,9 @@ export async function getMenu() {
     throw sectionsRes.error;
   }
 
+  logData("getMenu: raw cafe row", cafeRes.data);
+  logData("getMenu: raw first section (before sorting)", sectionsRes.data?.[0]);
+
   // Sort the nested items + options by their sort_order. RLS already hides inactive rows.
   const sections = (sectionsRes.data ?? []).map((section) => ({
     ...section,
@@ -50,10 +54,13 @@ export async function getMenu() {
 // Look up one table by its code (e.g. "T1").
 // Returns {code, label} or null if not found.
 export async function getTable(code) {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("dining_table")
     .select("code, label")
     .eq("code", code)
     .maybeSingle(); // null instead of an error when no row matches
+  if (error) {
+    throw error; // a DB failure must not render as "no such table" on a QR scan
+  }
   return data;
 }

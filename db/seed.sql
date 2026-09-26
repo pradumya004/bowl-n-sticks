@@ -1,4 +1,8 @@
 -- Bowl n Sticks - menu seed data (Phase 1)
+-- Supabase SQL Editor · Name: "02 - seed menu"
+-- Description: Loads the real menu - cafe, dining tables, sections, items and
+-- combo options. Re-runnable: deletes this cafe first, then re-inserts.
+--
 -- Run in Supabase SQL Editor AFTER 01_init_schema. Safe to re-run: it wipes
 -- this cafe's rows first (the delete cascades to sections/items/options/tables),
 -- then re-inserts everything fresh.

@@ -120,8 +120,10 @@ Veg/egg/non-veg/spicy tags, combo upgrades, and toppings from the real menu all 
 
 ### Phase 4 — Admin: Auth + Menu Management
 - [x] Admin login (Supabase Auth). → `@supabase/ssr` (browser+server clients + `middleware.js` guarding `/admin`), `/admin/login` (email+password), `/admin` home + logout. Signups off; write RLS via `db/admin-policies.sql`. Login loop verified.
-- [ ] CRUD: sections (add/remove/reorder), items, options. ← in progress (Step 5)
-- [ ] Toggle active/featured, edit text & prices, drag-to-reorder.
+- [x] CRUD: **sections** (add/edit name+blurb/hide/delete) and **items** (add/edit/hide/delete, all 9 fields) via modals + server actions. Items CRUD **fully tested 2026-09-26** (9-test script, verified against the DB): field round-trip with no clobbering, RLS hides inactive rows from the public key, blank price → MRP, defaults on minimal input, required-name validation, counts, clean delete with no orphans.
+- [x] Toggle active/featured + edit text & prices. (Featured/active both working.)
+- [ ] **Combo options CRUD** (the "+₹20 Make it..." upgrades on the 5 combos).
+- [ ] **Drag-to-reorder** sections and items (currently new rows append to the end via max(sort_order)+1).
 
 ### Phase 5 — Admin: Media
 - [ ] Upload/replace item & section images and videos (Supabase Storage).
@@ -200,6 +202,7 @@ Set in `web/.env.local` (local dev) AND in Vercel → Settings → Environment V
 
 ## 12. Status Log
 
+- **2026-09-26** — **Item CRUD DONE + fully tested.** 9-test script run against the live DB (Ramen Dishes), every result verified over the REST API, not just eyeballed: add writes all 9 fields correctly; new item appears on the public menu (proves `refreshMenu()` busts the static cache); edit changes only the fields touched (no clobbering); hide/show is enforced by RLS at the DB level, not hidden in the UI; blank price renders "MRP"; minimal input falls back to correct defaults (veg / not spicy / not featured / no badges); empty name is rejected; delete removes cleanly with no orphans. Menu is back to its seeded baseline (**141 items, 5 in Ramen Dishes**) with all three test dishes removed. Phase 4 remaining: combo options CRUD + drag-to-reorder.
 - **2026-09-21** — Plan created. Scope + stack locked (view-only Phase 1, Next.js + Supabase). Menu PDF parsed (~22 sections).
 - **2026-09-25** — **Admin restructure + UI hardening.** Routes: `/admin` is now the **dashboard**, sections moved to `/admin/sections` + `/admin/sections/[id]`; signed-in pages share `app/admin/(panel)/layout.js` (route group, so `/admin/login` gets no chrome). **Structure rule: `app/` holds routes only** — components live in `components/menu|admin/ui|admin/sections|admin/items|ui`, server actions in `lib/actions/{sections,items,shared}.js`, `lib/supabaseClient.js` renamed `lib/supabase/public.js`. Sidebar rebuilt as an **ink panel** (cream on ink, same pairing as the marquee), grouped nav with Soon badges for unbuilt areas, account + logout moved into it. **Browser-native UI replaced everywhere**: number spinners, checkboxes, `<select>` (now a segmented control), placeholders, selection colour, focus rings, scrollbars, Chrome autofill wash, `title` tooltips. Bugs fixed: missing `?.` on badges parse (would crash the dish form), 5c-ii form CSS never added, `ItemCardActions` imported but not rendered, blurb `-8px` margin overlapping the section title.
 - [ ] **TODO (licensing):** the spicy chilli uses **Twemoji** artwork (CC-BY 4.0) recoloured to brand red — it needs a visible credit (footer or NOTICE), or swap to Noto Emoji (Apache-2.0, no visible credit). Decide before launch.

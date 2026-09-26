@@ -21,7 +21,7 @@ export default async function SectionsPage() {
           <li key={s.id} className={`sec-card ${s.active ? "" : "is-off"}`}>
             <div className="sec-card-top">
               <h3>
-                <Link href={`/admin/sections/${s.id}`} className="sec-link">
+                <Link href={`/admin/sections/${s.slug}`} className="sec-link">
                   {s.name}
                 </Link>
               </h3>

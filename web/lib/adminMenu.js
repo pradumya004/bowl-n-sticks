@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { logData } from "@/lib/debug";
 
 const CAFE_SLUG = "bowl-n-sticks";
 
@@ -7,19 +8,24 @@ const CAFE_SLUG = "bowl-n-sticks";
 export async function getAdminSections() {
   const supabase = await createClient();
 
-  const { data: cafe } = await supabase
+  // Throw rather than return [] on a DB failure: an empty list would quietly
+  // tell the owner they have no sections, which is a much worse lie than a crash.
+  const { data: cafe, error: cafeError } = await supabase
     .from("cafe")
     .select("id")
     .eq("slug", CAFE_SLUG)
     .maybeSingle();
 
+  if (cafeError) {
+    throw cafeError;
+  }
   if (!cafe) {
     return [];
   }
 
   const { data, error } = await supabase
     .from("menu_section")
-    .select("id, name, blurb, sort_order, active, menu_item(count)")
+    .select("id, name, slug, blurb, sort_order, active, menu_item(count)")
     .eq("cafe_id", cafe.id)
     .order("sort_order");
 
@@ -35,24 +41,50 @@ export async function getAdminSections() {
 }
 
 // Admin read: one section with ALL its items (active + hidden), in display order.
-export async function getAdminSection(sectionId) {
+// Looked up by slug and scoped to the cafe - slugs are unique per cafe, not globally.
+export async function getAdminSection(slug) {
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("menu_section")
-    .select(
-      `id, name, blurb, active, sort_order, items:menu_item (id, name, description, price, diet_type, is_spicy, protein_g, badges, is_featured, active, sort_order)`,
-    )
-    .eq("id", sectionId)
+
+  const { data: cafe, error: cafeError } = await supabase
+    .from("cafe")
+    .select("id")
+    .eq("slug", CAFE_SLUG)
     .maybeSingle();
 
-  // A malformed id (not a UUID) makes Postgres error, so treat any failure here
-  // as "no such section" and let the page 404 instead of crashing with a 500.
-  if (error || !data) {
+  if (cafeError) {
+    throw cafeError;
+  }
+  if (!cafe) {
     return null;
   }
 
+  const { data, error } = await supabase
+    .from("menu_section")
+    .select(
+      `id, name, blurb, active, sort_order, items:menu_item (id, name, description, price, diet_type, is_spicy, protein_g, badges, is_featured, active, sort_order, options:menu_item_option (id, label, price, is_delta, sort_order))`,
+    )
+    .eq("cafe_id", cafe.id)
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+  if (!data) {
+    return null;
+  }
+
+  logData("getAdminSection: raw row from Postgres", data);
+
   return {
     ...data,
-    items: [...(data.items ?? [])].sort((a, b) => a.sort_order - b.sort_order),
+    items: [...(data.items ?? [])]
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map((item) => ({
+        ...item,
+        options: [...(item.options ?? [])].sort(
+          (a, b) => a.sort_order - b.sort_order,
+        ),
+      })),
   };
 }
