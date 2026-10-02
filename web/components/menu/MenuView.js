@@ -1,6 +1,6 @@
 import Marquee from "./Marquee";
 import Hero from "./Hero";
-import SectionNav from "./SectionNav";
+import SectionMenu from "./SectionMenu";
 import DishCard from "./DishCard";
 import Footer from "./Footer";
 
@@ -13,9 +13,6 @@ export default function MenuView({ cafe, sections, tableLabel }) {
       <Marquee />
       <div className="menu-wrap">
         <Hero cafe={cafe} tableLabel={tableLabel} />
-        <SectionNav
-          sections={visible.map((s) => ({ id: s.id, name: s.name }))}
-        />
 
         {visible.map((section) => (
           <section key={section.id} className="sec" id={section.id}>
@@ -31,6 +28,16 @@ export default function MenuView({ cafe, sections, tableLabel }) {
 
         <Footer />
       </div>
+
+      {/* outside .menu-wrap: it is position:fixed and must not inherit the
+          column's padding or stacking */}
+      <SectionMenu
+        sections={visible.map((s) => ({
+          id: s.id,
+          name: s.name,
+          count: s.items.length,
+        }))}
+      />
     </>
   );
 }

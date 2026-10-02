@@ -54,6 +54,25 @@ export function TrashIcon() {
   );
 }
 
+export function MenuIcon() {
+  return (
+    <Svg>
+      <path d="M4 7h16" />
+      <path d="M4 12h16" />
+      <path d="M4 17h16" />
+    </Svg>
+  );
+}
+
+export function CloseIcon() {
+  return (
+    <Svg>
+      <path d="M6 6l12 12" />
+      <path d="M18 6L6 18" />
+    </Svg>
+  );
+}
+
 export function SlidersIcon() {
   return (
     <Svg>

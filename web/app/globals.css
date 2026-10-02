@@ -100,7 +100,7 @@ body {
 
 /* ---- menu components (ported from the approved 03 preview) ---- */
 .menu-wrap {
-  max-width: 1080px;
+  max-width: 1320px; /* 4 dish columns on a laptop instead of 3 */
   margin: 0 auto;
   padding: 0 16px 70px;
 }
@@ -317,7 +317,7 @@ html {
   scroll-behavior: smooth;
 }
 .sec {
-  scroll-margin-top: 70px; /* so nav-chip jumps clear the sticky nav bar */
+  scroll-margin-top: 20px; /* breathing room when jumped to from the section menu */
 }
 
 /* marquee ribbon */
@@ -427,45 +427,6 @@ html {
 }
 
 /* sticky section nav */
-.nav {
-  position: sticky;
-  top: 0;
-  z-index: 6;
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding: 12px 0;
-  margin-bottom: 6px;
-  background: var(--color-paper);
-  border-bottom: 2.5px solid var(--color-ink);
-  scrollbar-width: none; /* Firefox */
-}
-.nav::-webkit-scrollbar {
-  display: none;
-}
-.nav a {
-  white-space: nowrap;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 13px;
-  color: var(--color-ink);
-  text-decoration: none;
-  padding: 8px 15px;
-  border: 2.5px solid var(--color-ink);
-  border-radius: 11px;
-  background: #fff;
-  box-shadow: 2px 2px 0 var(--color-ink);
-  transition: 0.12s;
-}
-.nav a:hover {
-  transform: translateY(-2px);
-  box-shadow: 3px 4px 0 var(--color-ink);
-}
-.nav a.on {
-  background: var(--color-red);
-  color: #fff;
-}
-
 /* footer */
 .foot {
   text-align: center;
@@ -1465,11 +1426,12 @@ html {
 /* three action buttons don't fit side by side on a narrow card: give them the
    full row and equal widths instead of letting them wrap raggedly */
 @media (max-width: 560px) {
+  /* Icon buttons are fixed 32px squares. The old rule stretched them across the
+     card, from when these were text buttons. Keep them right-aligned instead. */
   .sec-actions {
-    width: 100%;
-    margin-left: 0;
+    margin-left: auto;
   }
-  .sec-actions .btn {
+  .sec-actions .btn:not(.btn--icon) {
     flex: 1;
     justify-content: center;
   }
@@ -1783,4 +1745,124 @@ input:-webkit-autofill:focus {
   background: var(--color-yellow);
   border-style: solid;
   box-shadow: var(--sh-sm);
+}
+
+/* ---- floating section menu (replaces the old sticky chip bar) ---- */
+.secmenu-fab {
+  position: fixed;
+  right: max(18px, env(safe-area-inset-right, 0px));
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  max-width: min(72vw, 340px);
+  padding: 12px 18px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-paper);
+  background: var(--color-ink);
+  border: var(--line) solid var(--color-ink);
+  border-radius: var(--r-pill);
+  box-shadow: 4px 4px 0 var(--color-red);
+  cursor: pointer;
+  transition:
+    transform 0.14s ease,
+    box-shadow 0.14s ease;
+}
+.secmenu-fab:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--color-red);
+}
+.secmenu-fab svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+.secmenu-fab-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.secmenu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 18px;
+  background: rgba(20, 18, 16, 0.55);
+  animation: fadein 0.14s ease;
+}
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+}
+.secmenu-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 380px;
+  max-height: min(70dvh, 560px);
+  background: var(--color-paper);
+  border: var(--line-lg) solid var(--color-ink);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-xl);
+  animation: pop 0.16s ease;
+  outline: none;
+}
+.secmenu-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: var(--line) solid var(--color-ink);
+}
+.secmenu-head h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 19px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.secmenu-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+  overflow-y: auto;
+}
+.secmenu-list a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--r);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--color-ink);
+  text-decoration: none;
+}
+.secmenu-list a:hover {
+  background: var(--color-yellow);
+}
+.secmenu-list a.is-here {
+  background: var(--color-red);
+  color: #fff;
+}
+.secmenu-count {
+  font-size: 12px;
+  min-width: 26px;
+  padding: 2px 7px;
+  text-align: center;
+  border: var(--line-sm) solid currentColor;
+  border-radius: var(--r-pill);
 }
