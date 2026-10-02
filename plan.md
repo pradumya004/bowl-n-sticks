@@ -107,7 +107,7 @@ Veg/egg/non-veg/spicy tags, combo upgrades, and toppings from the real menu all 
 - [x] Design direction locked → bold "Manga Pop", preview `design-previews/03-manga-plus.html` (02 kept for reference). Strict palette: cream/ink/red/yellow. Now building into Next.
 - [x] Mobile-first layout: marquee, hero, sticky section nav, section blocks, item cards. Responsive grid (1 col phone / up to 3 desktop; featured spans full width).
 - [x] Veg/egg/non-veg/spicy indicators, featured treatment (red shadow + bob), combos & options display, badge/protein stickers.
-- [~] Search + filter: **section jump done** (sticky nav + IntersectionObserver active state). Search + veg-only/spicy filter NOT built yet — decide with owner.
+- [x] **Search + filter DONE (2026-10-03).** Sticky bar: search box + All/Veg/Egg/Non-veg/Spicy chips. It hides cards in place via `data-*` attributes rather than re-rendering 141 dishes in the browser, so the menu keeps its server-rendered speed. Sections with no matches hide too. Searches are logged (debounced, once per distinct query), which finally unblocks search analytics.
 - [x] Anime/Japanese polish: motion (marquee, pop, wiggle, bob, spin, chili shake), Space Grotesk + Inter, *Itadakimasu*, halftone.
 - [ ] Performance pass → deferred to Phase 7 (pairs with real images in Phase 5). Currently server-rendered, emoji placeholders.
 - [x] **Custom 404 + error pages** → `app/not-found.js` + `app/error.js`. Concept: a kitchen **order slip** for "the page you wanted", stamped **NOT FOUND** in red (stamp-slam animation), giant stroked number, 6 floating stickers, a quip line that cycles through 5 messages in pure CSS (no JS random = no hydration risk), Back-to-menu button. 500 page = same joke, `Status: Burnt`, stamped **REMAKE**. Covers public + admin routes.
@@ -127,7 +127,7 @@ Veg/egg/non-veg/spicy tags, combo upgrades, and toppings from the real menu all 
 
 ### Phase 5 — Admin: Media
 - [x] **Database tooling first**: `npm run migrate` applies `db/migrations/*.sql` once each, tracked in a `schema_migrations` table in the database, each file inside a transaction so a failure rolls back whole. `npm run sql -- "..."` for ad-hoc queries. Connection string lives in `SUPABASE_DB_URL` in `~/.bashrc`, never in the repo; `db/_connect.mjs` scrubs it from error output.
-- [x] Upload/replace/remove **item images** (Supabase Storage, `menu-media` bucket). Section images: columns + actions exist, UI not wired yet.
+- [x] Upload/replace/remove **item images AND section banner images** (Supabase Storage, `menu-media` bucket). Section banners render above the section title, 5:1 on desktop and 3:1 on a phone where a 5:1 strip is a sliver.
 - [x] Sensible size limits: 5 MB cap and an image-only mime allowlist enforced **by the bucket**, not just the form. Public reads, authenticated-only writes (verified: anon upload returns an RLS violation).
 - [x] Auto-optimized delivery: `next/image` with `fill` + `sizes="92px"`, so a 3 MB phone photo reaches a diner as a ~92px WebP.
 - [ ] **Videos** deliberately deferred — one clip outweighs every photo on the page, and "must not load slow" is a hard requirement. Revisit after seeing real photos on cafe wifi.
@@ -139,7 +139,7 @@ Veg/egg/non-veg/spicy tags, combo upgrades, and toppings from the real menu all 
 - [x] Dashboard: headline menu opens + a per-day trend across the window, scans per table, most-looked-at sections, busiest hours, busiest days. Range switcher 7/30/90 days.
 - [x] One `analytics_summary()` SQL function returns all of it as JSON in a single round trip; hours and days converted to **Asia/Kolkata** first (grouping raw UTC would report peak hours 5.5h off).
 - [x] **Item-level views** (migrations 008/009) — reversed the earlier decision at the owner's request, and done in a way that is not noise: a dish counts only after **1 second on screen**, once per page load, and ids are **batched into one call** (capped at 60 server-side). `record_item_views()` joins to `menu_item` so junk uuids are dropped rather than stored. Surfaces as **Top dishes**.
-- [ ] Search insights — blocked until menu search is built (deferred from Phase 2).
+- [x] **Search insights unblocked** — menu search now logs `search` events with the query.
 
 ### Phase 7 — Deploy, Domain & Performance
 - [ ] **Custom domain — decide BEFORE printing QR cards.** They currently encode `bowl-n-sticks.vercel.app`; changing the domain after printing means reprinting every card.
@@ -209,6 +209,8 @@ Set in `web/.env.local` (local dev) AND in Vercel → Settings → Environment V
 ---
 
 ## 12. Status Log
+
+- **2026-10-03 (parked work cleared + project rules written down)** — **`CLAUDE.md` created at the repo root**: 11 sections covering the responsive rule and its method, the locked design, UI consistency, writing style, commit format, how to explain things, the database workflow, the security rules, file/media handling, privacy, and the non-code things that matter (the domain decision). **Menu search + diet/spicy filter shipped** - a sticky bar that hides cards in place through `data-*` attributes instead of re-rendering 141 dishes client-side, so the menu keeps its server-rendered speed; empty sections hide with their dishes; searches are logged debounced and once per distinct query, which unblocks search analytics. Matching happens during render from plain data, not in an effect (the `set-state-in-effect` rule that has now bitten three times). **Section banner images** wired end to end, reusing the existing columns and actions. **Test harness moved into the repo** at `web/test/` with a README and `npm test` - 83 assertions across the three suites, all passing. Full overflow sweep re-run across 12 page/width combinations: all clean.
 
 - **2026-10-03 (responsive is now a rule, not a habit)** — Written into the project skill and memory: **no page is done until it has been LOOKED AT at 390px and 820px.** Method documented too, because Chrome ignores `resize_window` on this machine: render the page in fixed-width iframes and screenshot, since media queries respond to the frame width. Ran the full sweep and found a real bug: **`/admin/settings` overflowed horizontally on a phone.** Cause worth remembering - a grid/flex item defaults to `min-width: auto`, and an `<input>`'s intrinsic minimum is its `size` attribute (~20 characters), so a two-column field row refused to shrink below ~380px regardless of `width: 100%`. Fixed with `min-width: 0` on the field wrappers and inputs, and `.admin-row2`'s minimum raised 140 → 170px so paired fields stack on a phone instead of squeezing to 115px each. All 14 page/width combinations now measure zero horizontal overflow.
 

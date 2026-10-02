@@ -10,10 +10,16 @@ export default function DishCard({ item }) {
   const hasProtein = item.protein_g != null;
   const hasTags = item.badges?.length || hasProtein || item.is_spicy;
   const photo = mediaUrl(item.image_path);
+  // data-* attributes let the filter hide cards in place. The alternative is
+  // re-rendering 141 dishes in the browser, which would cost the whole menu its
+  // server-rendered speed for a feature most diners never touch.
   return (
     <div
       className={`card ${item.is_featured ? "feat" : ""}`}
       data-dish={item.id}
+      data-name={`${item.name} ${item.description ?? ""}`.toLowerCase()}
+      data-diet={item.diet_type}
+      data-spicy={item.is_spicy ? "1" : "0"}
     >
       <div className={`thumb ${photo ? "has-photo" : ""}`}>
         {photo ? (

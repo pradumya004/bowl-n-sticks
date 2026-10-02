@@ -2868,3 +2868,139 @@ input:-webkit-autofill:focus {
 .admin-field textarea {
   min-width: 0;
 }
+
+/* ---- menu: search + diet filter ---- */
+/* Sticky, because search you cannot reach after scrolling is search nobody
+   uses. Kept to one compact row so it costs little vertical space. */
+.filterbar {
+  position: sticky;
+  top: 0;
+  z-index: 8;
+  padding: 10px 0 8px;
+  margin-bottom: 4px;
+  background: var(--color-paper);
+  border-bottom: var(--line) solid var(--color-ink);
+}
+.filterbar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.filter-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 8px 12px;
+  background: #fff;
+  border: var(--line) solid var(--color-ink);
+  border-radius: var(--r-pill);
+  box-shadow: var(--sh-sm);
+}
+.filter-search svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  opacity: 0.55;
+}
+.filter-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+}
+/* the browser's own clear X is drawn by the OS and cannot be styled */
+.filter-search input[type="search"]::-webkit-search-cancel-button {
+  display: none;
+}
+.filter-search button {
+  display: grid;
+  place-items: center;
+  padding: 2px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.filter-search button svg {
+  opacity: 1;
+}
+
+.filter-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.fchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--color-ink);
+  background: #fff;
+  border: var(--line-sm) solid var(--color-ink);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: 0.12s ease;
+}
+.fchip:hover {
+  background: var(--color-yellow);
+}
+.fchip.is-on {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+.fchip .spicy-mark {
+  width: 15px;
+  height: 15px;
+  animation: none;
+}
+.filter-count {
+  margin-top: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  opacity: 0.75;
+}
+.filter-count button {
+  font: inherit;
+  text-decoration: underline;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-red);
+}
+/* while filtering, the section headings stay but the hero spacing tightens */
+.is-filtering .sec {
+  padding-top: 14px;
+}
+
+/* ---- menu: optional section banner ---- */
+.sec-banner {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 5 / 1;
+  margin-bottom: 14px;
+  overflow: hidden;
+  background: var(--color-ink);
+  border: var(--line) solid var(--color-ink);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh);
+}
+.sec-banner img {
+  object-fit: cover;
+}
+@media (max-width: 560px) {
+  .sec-banner {
+    aspect-ratio: 3 / 1; /* a 5:1 strip is a sliver on a phone */
+  }
+}

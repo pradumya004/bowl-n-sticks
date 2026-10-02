@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "node --experimental-loader ./test/loader.mjs test/run.mjs && node --experimental-loader ./test/loader.mjs test/run2.mjs && node --experimental-loader ./test/loader.mjs test/run3.mjs",
     "lint": "eslint"
   },
   "dependencies": {

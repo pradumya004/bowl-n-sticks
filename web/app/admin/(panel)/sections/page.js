@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { getAdminSections } from "@/lib/adminMenu";
 import { reorderSections } from "@/lib/actions/sections";
+import { setSectionImage, removeSectionImage } from "@/lib/actions/media";
 import AddSectionButton from "@/components/admin/sections/AddSectionButton";
 import SectionCardActions from "@/components/admin/sections/SectionCardActions";
+import PhotoButton from "@/components/admin/media/PhotoButton";
 import SortableList from "@/components/admin/ui/SortableList";
 import SortableItem from "@/components/admin/ui/SortableItem";
 
@@ -52,6 +54,14 @@ export default async function SectionsPage() {
 
             <div className="sec-card-foot">
               {!s.active && <span className="pill pill--ink">Hidden</span>}
+              <PhotoButton
+                id={s.id}
+                name={s.name}
+                folder="sections"
+                imagePath={s.image_path}
+                onSave={setSectionImage}
+                onRemove={removeSectionImage}
+              />
               <SectionCardActions section={s} />
             </div>
           </SortableItem>
