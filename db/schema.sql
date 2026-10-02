@@ -47,6 +47,7 @@ create table if not exists menu_section (
   slug text generated always as (
     trim(both '-' from regexp_replace(lower(name), '[^a-z0-9]+', '-', 'g'))
   ) stored,
+  image_path text, -- optional section banner, path inside the storage bucket
   sort_order int not null default 0, -- controls display order (low first)
   active boolean not null default true,
   created_at timestamptz not null default now(),
@@ -78,8 +79,8 @@ create table if not exists menu_item (
     protein_g is null
     or protein_g >= 0
   ), -- e.g. "26g protein"; null otherwise
-  image_url text,
-  video_url text,
+  image_path text, -- path inside the storage bucket, NOT a full URL
+  video_path text,
   badges text[] not null default '{}', -- labels: "Highest selling", "must try", "ALL NEW"
   is_featured boolean not null default false, -- push this one visually (fan favorite)
   sort_order int not null default 0,

@@ -1426,6 +1426,28 @@ html {
 /* three action buttons don't fit side by side on a narrow card: give them the
    full row and equal widths instead of letting them wrap raggedly */
 @media (max-width: 560px) {
+  /* The admin top strip scrolls sideways at this width, which pushed the
+     account and Log out button off-screen with nothing to show they were there.
+     Wrap onto a second row instead: everything stays reachable. */
+  .admin-sidebar {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    row-gap: 10px;
+  }
+  .admin-side {
+    flex-wrap: wrap;
+  }
+  .admin-account {
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: var(--line-sm) dashed rgba(251, 243, 231, 0.3);
+  }
+  .admin-account .who-email {
+    max-width: 62%;
+  }
+
   /* Icon buttons are fixed 32px squares. The old rule stretched them across the
      card, from when these were text buttons. Keep them right-aligned instead. */
   .sec-actions {

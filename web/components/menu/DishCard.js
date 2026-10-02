@@ -9,7 +9,7 @@ export default function DishCard({ item }) {
   const hasTags = item.badges?.length || hasProtein || item.is_spicy;
   return (
     <div className={`card ${item.is_featured ? "feat" : ""}`}>
-      {/* 🍜 is a placeholder; real photos come in Phase 5 (item.image_url) */}
+      {/* 🍜 placeholder until a photo is uploaded (item.image_path) */}
       <div className="thumb">🍜</div>
       <div className="m">
         <div className="top">

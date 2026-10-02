@@ -26,6 +26,7 @@ export default async function SectionsPage() {
       )}
 
       <SortableList
+        id="sections"
         ids={sections.map((s) => s.id)}
         action={reorderSections}
         className="admin-grid"

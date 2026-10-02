@@ -21,7 +21,7 @@ import {
 // own copy of the order so the cards move the instant you drop, then send the
 // whole new order to `action`. If the write fails we put the old order back,
 // rather than leaving the screen showing something the database doesn't agree with.
-export default function SortableList({ ids, action, className, children }) {
+export default function SortableList({ id, ids, action, className, children }) {
   const [order, setOrder] = useState(ids);
   const [error, setError] = useState(null);
   const [, startTransition] = useTransition();
@@ -79,7 +79,11 @@ export default function SortableList({ ids, action, className, children }) {
     <>
       {error && <p className="admin-error">{error}</p>}
 
+      {/* A stable id matters: without one dnd-kit numbers its aria-describedby
+          by render order, which differs between server and client and throws a
+          hydration mismatch. */}
       <DndContext
+        id={id}
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
