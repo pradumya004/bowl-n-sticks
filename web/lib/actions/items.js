@@ -1,6 +1,7 @@
 "use server";
 import { createClient } from "@/lib/supabase/server";
-import { refreshMenu, dbFailure } from "./shared";
+import { refreshMenu, dbFailure, logFailure } from "./shared";
+import { MEDIA_BUCKET } from "@/lib/storage";
 
 // Each action returns the reason it failed, or nothing at all on success.
 const GONE = "That dish no longer exists. Refresh the page.";
@@ -127,6 +128,14 @@ export async function deleteItem(formData) {
   const id = formData.get("id")?.toString();
   if (!id) return "Missing dish id.";
 
+  // Read the photo path first: the row is about to be gone, and Postgres has no
+  // idea the storage file exists, so nothing else would ever clean it up.
+  const { data: row } = await supabase
+    .from("menu_item")
+    .select("image_path")
+    .eq("id", id)
+    .maybeSingle();
+
   const { data, error } = await supabase
     .from("menu_item")
     .delete()
@@ -134,6 +143,13 @@ export async function deleteItem(formData) {
     .select("id"); // cascades to its options
   if (error) return dbFailure("deleteItem", error);
   if (!data?.length) return "That dish was already deleted.";
+
+  if (row?.image_path) {
+    const { error: fileError } = await supabase.storage
+      .from(MEDIA_BUCKET)
+      .remove([row.image_path]);
+    if (fileError) logFailure("deleteItem photo cleanup", fileError);
+  }
 
   refreshMenu();
 }

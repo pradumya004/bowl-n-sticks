@@ -25,7 +25,7 @@ export async function getAdminSections() {
 
   const { data, error } = await supabase
     .from("menu_section")
-    .select("id, name, slug, blurb, sort_order, active, menu_item(count)")
+    .select("id, name, slug, blurb, sort_order, active, image_path, menu_item(count)")
     .eq("cafe_id", cafe.id)
     .order("sort_order");
 
@@ -61,7 +61,7 @@ export async function getAdminSection(slug) {
   const { data, error } = await supabase
     .from("menu_section")
     .select(
-      `id, name, blurb, active, sort_order, items:menu_item (id, name, description, price, diet_type, is_spicy, protein_g, badges, is_featured, active, sort_order, options:menu_item_option (id, label, price, is_delta, sort_order))`,
+      `id, name, blurb, active, sort_order, image_path, items:menu_item (id, name, description, price, diet_type, is_spicy, protein_g, badges, is_featured, active, sort_order, image_path, options:menu_item_option (id, label, price, is_delta, sort_order))`,
     )
     .eq("cafe_id", cafe.id)
     .eq("slug", slug)

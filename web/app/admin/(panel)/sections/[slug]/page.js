@@ -2,9 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAdminSection } from "@/lib/adminMenu";
 import { reorderItems } from "@/lib/actions/items";
+import { uploadItemImage, removeItemImage } from "@/lib/actions/media";
 import AddItemButton from "@/components/admin/items/AddItemButton";
 import ItemCardActions from "@/components/admin/items/ItemCardActions";
 import OptionsButton from "@/components/admin/options/OptionsButton";
+import PhotoButton from "@/components/admin/media/PhotoButton";
 import SortableList from "@/components/admin/ui/SortableList";
 import SortableItem from "@/components/admin/ui/SortableItem";
 import SpicyMark from "@/components/ui/SpicyMark";
@@ -89,6 +91,13 @@ export default async function SectionItemsPage({ params }) {
             </div>
 
             <div className="sec-card-foot">
+              <PhotoButton
+                id={item.id}
+                name={item.name}
+                imagePath={item.image_path}
+                onUpload={uploadItemImage}
+                onRemove={removeItemImage}
+              />
               <OptionsButton item={item} />
               <ItemCardActions item={item} />
             </div>

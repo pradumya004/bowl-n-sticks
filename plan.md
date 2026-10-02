@@ -126,8 +126,11 @@ Veg/egg/non-veg/spicy tags, combo upgrades, and toppings from the real menu all 
 - [x] **Drag-to-reorder** sections and items. Migration 002 adds `reorder_menu_sections(ids)` / `reorder_menu_items(ids)`: `unnest(ids) with ordinality` rewrites every `sort_order` in one atomic call and returns the row count, so a stale list is caught instead of silently half-applied. `security invoker` + `revoke from anon` keeps RLS in force and refuses anonymous callers outright. UI is dnd-kit with a grip strip per card (the only drag target, so the card's own buttons still work), optimistic order with rollback on failure.
 
 ### Phase 5 — Admin: Media
-- [ ] Upload/replace item & section images and videos (Supabase Storage).
-- [ ] Auto-optimized delivery; sensible size limits.
+- [x] **Database tooling first**: `npm run migrate` applies `db/migrations/*.sql` once each, tracked in a `schema_migrations` table in the database, each file inside a transaction so a failure rolls back whole. `npm run sql -- "..."` for ad-hoc queries. Connection string lives in `SUPABASE_DB_URL` in `~/.bashrc`, never in the repo; `db/_connect.mjs` scrubs it from error output.
+- [x] Upload/replace/remove **item images** (Supabase Storage, `menu-media` bucket). Section images: columns + actions exist, UI not wired yet.
+- [x] Sensible size limits: 5 MB cap and an image-only mime allowlist enforced **by the bucket**, not just the form. Public reads, authenticated-only writes (verified: anon upload returns an RLS violation).
+- [x] Auto-optimized delivery: `next/image` with `fill` + `sizes="92px"`, so a 3 MB phone photo reaches a diner as a ~92px WebP.
+- [ ] **Videos** deliberately deferred — one clip outweighs every photo on the page, and "must not load slow" is a hard requirement. Revisit after seeing real photos on cafe wifi.
 
 ### Phase 6 — Admin: Dashboard + Analytics
 - [ ] Capture events (menu open per table, item/section views, searches incl. no-results).
@@ -201,6 +204,8 @@ Set in `web/.env.local` (local dev) AND in Vercel → Settings → Environment V
 ---
 
 ## 12. Status Log
+
+- **2026-10-03** — **Phase 5 (photos) LIVE + migrations are now self-serve.** Built `npm run migrate` / `npm run sql` at the repo root (`pg` over the session pooler), so schema changes no longer need hand-pasting into the dashboard. What has run is tracked in a `schema_migrations` table **in the database**, each migration wrapped in a transaction. Credentials live in `SUPABASE_DB_URL` in `~/.bashrc`, outside the repo, and `_connect.mjs` scrubs connection strings out of error output. Baselined 001-002 (already applied by hand), then applied **003** (image_url/video_url → image_path/video_path, + menu_section.image_path) and **004** (the `menu-media` bucket: public read, 5 MB cap, image-only mime allowlist, authenticated-only writes). Verified against the live DB: columns exist, bucket configured, all 4 storage policies present, and an anonymous upload is refused with an RLS violation while anonymous read works. App side: upload/replace/remove photo per dish (fresh random filename each time so a replace is not served stale from the CDN; row repointed before the old file is deleted; section and dish deletes clean up their storage files, which Postgres' cascade cannot see), `next/image` on the menu with the 🍜 tile as fallback. Videos deferred on purpose.
 
 - **2026-10-02** — **Admin responsive fix + hydration error, found by driving the browser.** Window resize would not take in Chrome, so the admin was rendered inside 360/390/560px iframes to exercise the breakpoints. Two real faults: (1) under 560px the admin top strip was `overflow-x: auto` with `margin-left: auto` on the account block, which pushed the signed-in email and **Log out entirely off-screen** with nothing to indicate horizontal scroll - it now wraps onto its own row; (2) dnd-kit numbers its `aria-describedby` by render order, so server and client disagreed and every admin list page threw a **hydration mismatch** - fixed by passing a stable `id` to `DndContext`. Console is clean on sections, items, dashboard and the public menu. Phase 5 (media) parked: it needs DDL that only the owner can run.
 

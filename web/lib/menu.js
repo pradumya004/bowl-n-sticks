@@ -17,9 +17,9 @@ export async function getMenu() {
       .from("menu_section")
       .select(
         // "items:" and "options:" rename the nested tables to friendlier keys
-        `id, name, blurb, sort_order,
+        `id, name, blurb, sort_order, image_path,
          items:menu_item (
-           id, name, description, price, diet_type, is_spicy, protein_g, badges, is_featured, sort_order,
+           id, name, description, price, diet_type, is_spicy, protein_g, badges, is_featured, sort_order, image_path,
            options:menu_item_option ( label, price, is_delta, sort_order )
          )`,
       )

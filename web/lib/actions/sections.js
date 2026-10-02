@@ -1,6 +1,7 @@
 "use server";
 import { createClient } from "@/lib/supabase/server";
-import { getCafeId, refreshMenu, dbFailure } from "./shared";
+import { getCafeId, refreshMenu, dbFailure, logFailure } from "./shared";
+import { MEDIA_BUCKET } from "@/lib/storage";
 
 // Each action returns the reason it failed, or nothing at all on success.
 const GONE = "That section no longer exists. Refresh the page.";
@@ -95,6 +96,19 @@ export async function deleteSection(formData) {
   const id = formData.get("id")?.toString();
   if (!id) return "Missing section id.";
 
+  // Deleting a section cascades to its dishes in Postgres, but storage files
+  // are invisible to that cascade. Collect every path first, or they orphan.
+  const { data: section } = await supabase
+    .from("menu_section")
+    .select("image_path, items:menu_item (image_path)")
+    .eq("id", id)
+    .maybeSingle();
+
+  const paths = [
+    section?.image_path,
+    ...(section?.items ?? []).map((i) => i.image_path),
+  ].filter(Boolean);
+
   const { data, error } = await supabase
     .from("menu_section")
     .delete()
@@ -102,6 +116,13 @@ export async function deleteSection(formData) {
     .select("id"); // cascades to its items
   if (error) return dbFailure("deleteSection", error);
   if (!data?.length) return "That section was already deleted.";
+
+  if (paths.length) {
+    const { error: fileError } = await supabase.storage
+      .from(MEDIA_BUCKET)
+      .remove(paths);
+    if (fileError) logFailure("deleteSection photo cleanup", fileError);
+  }
 
   refreshMenu();
 }

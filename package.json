@@ -1,0 +1,14 @@
+{
+  "name": "bowl-n-sticks-db",
+  "private": true,
+  "type": "module",
+  "description": "Database tooling. The app itself lives in web/.",
+  "scripts": {
+    "migrate": "node db/run-migrations.mjs",
+    "migrate:status": "node db/run-migrations.mjs --status",
+    "sql": "node db/run-sql.mjs"
+  },
+  "devDependencies": {
+    "pg": "^8.13.1"
+  }
+}
