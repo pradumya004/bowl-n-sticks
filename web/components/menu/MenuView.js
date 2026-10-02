@@ -3,13 +3,15 @@ import Hero from "./Hero";
 import SectionMenu from "./SectionMenu";
 import DishCard from "./DishCard";
 import Footer from "./Footer";
+import TrackMenuOpen from "./TrackMenuOpen";
 
 // The whole menu page. Shared by "/" (no table) and "/t/[code]" (with a table).
-export default function MenuView({ cafe, sections, tableLabel }) {
+export default function MenuView({ cafe, sections, tableLabel, tableCode }) {
   const visible = sections.filter((s) => s.items.length > 0);
 
   return (
     <>
+      <TrackMenuOpen tableCode={tableCode} />
       <Marquee />
       <div className="menu-wrap">
         <Hero cafe={cafe} tableLabel={tableLabel} />

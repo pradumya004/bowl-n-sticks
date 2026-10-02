@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { MenuIcon, CloseIcon } from "@/components/ui/icons";
+import { track } from "@/lib/track";
 
 // Floating section jumper, the Swiggy/Zomato pattern. Replaces the old sticky
 // chip bar: 23 sections never fit in a strip, so everything past Pizza was
@@ -9,6 +10,9 @@ export default function SectionMenu({ sections }) {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(sections[0]?.id);
   const panelRef = useRef(null);
+  // Sections already counted on this page load. Without it, scrolling up and
+  // down the menu would log the same section over and over.
+  const counted = useRef(new Set());
 
   // Track which section is under the viewport, same as the old nav did.
   useEffect(() => {
@@ -23,7 +27,12 @@ export default function SectionMenu({ sections }) {
           visible.sort(
             (a, b) => a.boundingClientRect.top - b.boundingClientRect.top,
           );
-          setActive(visible[0].target.id);
+          const id = visible[0].target.id;
+          setActive(id);
+          if (!counted.current.has(id)) {
+            counted.current.add(id);
+            track("section_view", { sectionId: id });
+          }
         }
       },
       { rootMargin: "-10% 0px -70% 0px", threshold: 0 },

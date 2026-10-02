@@ -133,8 +133,13 @@ Veg/egg/non-veg/spicy tags, combo upgrades, and toppings from the real menu all 
 - [ ] **Videos** deliberately deferred — one clip outweighs every photo on the page, and "must not load slow" is a hard requirement. Revisit after seeing real photos on cafe wifi.
 
 ### Phase 6 — Admin: Dashboard + Analytics
-- [ ] Capture events (menu open per table, item/section views, searches incl. no-results).
-- [ ] Dashboard: views per table, top items & sections, peak hours/days, search insights.
+- [x] Capture events: `menu_open` (with table code from the QR) and `section_view` (first time each section is scrolled to, deduped per page load). Search events are wired through but unused until search exists.
+- [x] **Privacy by design**: no IP, no user agent, no cookie, no device id. A row is what happened, which table, and when.
+- [x] **Customers can write but not read.** No RLS policy for `anon` on `analytics_event` at all; the only door is `record_event()`, a narrow `security definer` function that validates the event type, resolves `cafe_id` itself so it can't be forged, and truncates free text. Verified: anon write 204, anon table read returns `[]` while rows exist, forged event type rejected, `analytics_summary` refused outright.
+- [x] Dashboard: headline menu opens + a per-day trend across the window, scans per table, most-looked-at sections, busiest hours, busiest days. Range switcher 7/30/90 days.
+- [x] One `analytics_summary()` SQL function returns all of it as JSON in a single round trip; hours and days converted to **Asia/Kolkata** first (grouping raw UTC would report peak hours 5.5h off).
+- [ ] Search insights — blocked until menu search is built (deferred from Phase 2).
+- [ ] Item-level views — deliberately skipped: a per-card observer on 141 dishes is a lot of noise for a question section views already answer.
 
 ### Phase 7 — Deploy, Domain & Performance
 - [ ] Custom domain (e.g. maggilicious.com) — optional, when ready.
@@ -204,6 +209,8 @@ Set in `web/.env.local` (local dev) AND in Vercel → Settings → Environment V
 ---
 
 ## 12. Status Log
+
+- **2026-10-03 (later)** — **PHASE 6 DONE: analytics + dashboard.** Migrations 005/006 add `analytics_event` (bigint identity key, not uuid: this table outgrows every other one and a random uuid key bloats the index), `record_event()` as the single customer write path, and `analytics_summary()` returning the whole dashboard as one JSON round trip. Security verified against the live project, not assumed. Dashboard rebuilt: ink hero panel with the headline number and a 30-day trend, then scans/table, most-looked-at sections, busiest hours, busiest days, with a 7/30/90 range switcher. Charts are hand-built CSS, no charting library. Ran the dataviz palette validator, which **failed brand yellow at 1.54:1 contrast on cream** — so bars are red with the unique winner in ink, and yellow stays an accent. Values are always visible rather than hover-only, so each chart doubles as its own table view. Seeded ~550 sample events to judge the design, screenshotted at 30d and 7d, then deleted every row: `analytics_event` is back to 0.
 
 - **2026-10-03** — **Phase 5 (photos) LIVE + migrations are now self-serve.** Built `npm run migrate` / `npm run sql` at the repo root (`pg` over the session pooler), so schema changes no longer need hand-pasting into the dashboard. What has run is tracked in a `schema_migrations` table **in the database**, each migration wrapped in a transaction. Credentials live in `SUPABASE_DB_URL` in `~/.bashrc`, outside the repo, and `_connect.mjs` scrubs connection strings out of error output. Baselined 001-002 (already applied by hand), then applied **003** (image_url/video_url → image_path/video_path, + menu_section.image_path) and **004** (the `menu-media` bucket: public read, 5 MB cap, image-only mime allowlist, authenticated-only writes). Verified against the live DB: columns exist, bucket configured, all 4 storage policies present, and an anonymous upload is refused with an RLS violation while anonymous read works. App side: upload/replace/remove photo per dish (fresh random filename each time so a replace is not served stale from the CDN; row repointed before the old file is deleted; section and dish deletes clean up their storage files, which Postgres' cascade cannot see), `next/image` on the menu with the 🍜 tile as fallback. Videos deferred on purpose.
 

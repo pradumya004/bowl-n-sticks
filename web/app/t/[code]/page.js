@@ -11,5 +11,14 @@ export default async function TablePage({ params }) {
   ]);
 
   // If the code isn't a real table, the table is null and the hero just shows the generic line, menu still loads fine.
-  return <MenuView cafe={cafe} sections={sections} tableLabel={table?.label} />;
+  // table?.code, not the raw URL: an unknown code logs as "no table" rather
+  // than filling analytics with whatever someone typed.
+  return (
+    <MenuView
+      cafe={cafe}
+      sections={sections}
+      tableLabel={table?.label}
+      tableCode={table?.code}
+    />
+  );
 }
