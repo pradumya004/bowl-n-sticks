@@ -2587,11 +2587,26 @@ input:-webkit-autofill:focus {
 }
 
 /* ---- admin: settings form ---- */
+/* The panels sit in the same grid the dashboard uses. As one 760px column it
+   left a void beside it on a laptop, which is what made the page feel like it
+   belonged to a different app. */
 .settings-form {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: start;
   gap: 14px;
-  max-width: 760px;
+}
+/* Two columns, never more. auto-fit gave four on a laptop, which squeezed the
+   tagline and left the rules box too small to use. */
+@media (min-width: 900px) {
+  .settings-form {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.settings-form .admin-error,
+.settings-form .admin-ok,
+.settings-actions {
+  grid-column: 1 / -1;
 }
 .settings-fields {
   display: flex;
@@ -2680,5 +2695,45 @@ input:-webkit-autofill:focus {
   .qr-card {
     break-inside: avoid;
     box-shadow: none;
+  }
+}
+
+/* ---- admin: QR page layout ---- */
+/* One column width for the whole page. Before this the warning banner ran the
+   full window while the paragraph beside it wrapped at half that, which is what
+   made the page look unfinished. */
+.qr-page {
+  max-width: 100%;
+}
+.qr-page .admin-sectionblurb,
+.qr-page .admin-error {
+  max-width: 100%;
+  margin-bottom: 16px;
+}
+/* auto-FIT, not auto-fill: auto-fill keeps empty tracks, which left four cards
+   huddled on the left of a wide screen with a void beside them. */
+.qr-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr));
+}
+.qr-art {
+  max-width: 100%;
+}
+.qr-card {
+  padding: 14px 12px 12px;
+}
+.qr-code {
+  font-size: 22px;
+  margin-top: 6px;
+}
+@media (max-width: 480px) {
+  .qr-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .qr-code {
+    font-size: 18px;
+  }
+  .qr-url {
+    display: none; /* the url is noise on a phone; the code and label identify it */
   }
 }

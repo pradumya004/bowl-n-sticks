@@ -13,7 +13,7 @@ export default async function QrPage() {
   const isLocal = host?.startsWith("localhost");
 
   return (
-    <>
+    <div className="qr-page">
       <div className="admin-secthead">
         <h2>
           QR codes{" "}
@@ -54,6 +54,6 @@ export default async function QrPage() {
         Printing: use your browser&apos;s print dialog on this page. The codes are
         SVG, so they stay sharp at any size.
       </p>
-    </>
+    </div>
   );
 }
