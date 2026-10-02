@@ -24,3 +24,20 @@ export async function track(type, { tableCode, sectionId, query } = {}) {
     // write failed.
   }
 }
+
+// A screenful of dishes in one call. The browser collects what was actually
+// looked at and sends the list; one request per dish would be absurd on a phone.
+export async function trackItems(itemIds) {
+  if (!itemIds?.length) {
+    return;
+  }
+  try {
+    const supabase = createClient();
+    await supabase.rpc("record_item_views", {
+      p_cafe_slug: CAFE_SLUG,
+      p_item_ids: itemIds.slice(0, 60), // the function rejects more than 60
+    });
+  } catch {
+    // never break the menu over a stats write
+  }
+}

@@ -11,7 +11,10 @@ export default function DishCard({ item }) {
   const hasTags = item.badges?.length || hasProtein || item.is_spicy;
   const photo = mediaUrl(item.image_path);
   return (
-    <div className={`card ${item.is_featured ? "feat" : ""}`}>
+    <div
+      className={`card ${item.is_featured ? "feat" : ""}`}
+      data-dish={item.id}
+    >
       <div className={`thumb ${photo ? "has-photo" : ""}`}>
         {photo ? (
           /* sizes tells next/image which widths to generate: the thumb is 76px

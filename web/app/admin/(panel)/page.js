@@ -103,11 +103,11 @@ export default async function Dashboard() {
           }))}
         />
         <BarList
-          title="Most looked at"
-          empty="Nobody has scrolled the menu yet."
-          rows={(stats?.top_sections ?? []).map((s) => ({
-            label: s.name,
-            value: Number(s.views),
+          title="Top dishes"
+          empty="No dish views yet. This fills as people scroll the menu."
+          rows={(stats?.top_dishes ?? []).map((d) => ({
+            label: d.name,
+            value: Number(d.views),
           }))}
         />
       </div>

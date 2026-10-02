@@ -4,7 +4,6 @@ import { usePathname } from "next/navigation";
 import {
   GridIcon,
   BowlIcon,
-  CameraIcon,
   SmileIcon,
   QrIcon,
   ChartIcon,
@@ -24,15 +23,12 @@ const GROUPS = [
   {
     label: "Content",
     links: [
-      // Photos exist now, so this points at the dishes still missing one -
-      // which is the only reason you'd open a photos screen.
-      { href: "/admin/needs/no-photo", label: "Photos", icon: <CameraIcon /> },
       { label: "Meme Feed", icon: <SmileIcon />, soon: true },
     ],
   },
   {
     label: "Tables",
-    links: [{ label: "QR Codes", icon: <QrIcon />, soon: true }],
+    links: [{ href: "/admin/qr", label: "QR Codes", icon: <QrIcon /> }],
   },
   {
     label: "Insights",

@@ -58,8 +58,7 @@ export default async function AnalyticsPage({ searchParams }) {
           </span>
           <span className="hero-stat-sub">
             last {days} days ·{" "}
-            {Number(stats?.section_views ?? 0).toLocaleString("en-IN")} section
-            views
+            {Number(stats?.item_views ?? 0).toLocaleString("en-IN")} dish views
           </span>
         </div>
         <Trend
@@ -80,7 +79,15 @@ export default async function AnalyticsPage({ searchParams }) {
           }))}
         />
         <BarList
-          title="Most looked at"
+          title="Top dishes"
+          empty="No dish views yet. This fills as people scroll the menu."
+          rows={(stats?.top_dishes ?? []).map((d) => ({
+            label: d.name,
+            value: Number(d.views),
+          }))}
+        />
+        <BarList
+          title="Most looked at sections"
           empty="Nobody has scrolled the menu yet."
           rows={(stats?.top_sections ?? []).map((s) => ({
             label: s.name,

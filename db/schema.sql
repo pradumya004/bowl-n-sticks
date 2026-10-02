@@ -285,7 +285,7 @@ create table if not exists analytics_event (
   -- the index; a bigint is 8 bytes and always appends.
   id bigint generated always as identity primary key,
   cafe_id uuid not null references cafe (id) on delete cascade,
-  type text not null check (type in ('menu_open', 'section_view', 'search')),
+  type text not null check (type in ('menu_open', 'section_view', 'item_view', 'search')),
   table_code text, -- 'T1'; null when opened without scanning a QR
   section_id uuid references menu_section (id) on delete set null,
   item_id uuid references menu_item (id) on delete set null,
@@ -391,12 +391,11 @@ set
     'days', p_days,
     'menu_opens', (select count(*) from scoped where type = 'menu_open'),
     'section_views', (select count(*) from scoped where type = 'section_view'),
+    'item_views', (select count(*) from scoped where type = 'item_view'),
     'by_date', coalesce((
       select json_agg(t order by t.d) from (
-        select days.d,
-               count(s.id) filter (where s.type = 'menu_open') as views
-        from days
-        left join scoped s on s.local_at::date = days.d
+        select days.d, count(s.id) filter (where s.type = 'menu_open') as views
+        from days left join scoped s on s.local_at::date = days.d
         group by days.d
       ) t
     ), '[]'::json),
@@ -413,6 +412,14 @@ set
         from scoped s join menu_section ms on ms.id = s.section_id
         where s.type = 'section_view'
         group by ms.name order by views desc limit 8
+      ) t
+    ), '[]'::json),
+    'top_dishes', coalesce((
+      select json_agg(t) from (
+        select mi.name, count(*) as views
+        from scoped s join menu_item mi on mi.id = s.item_id
+        where s.type = 'item_view'
+        group by mi.name order by views desc limit 10
       ) t
     ), '[]'::json),
     'by_hour', coalesce((
@@ -432,7 +439,6 @@ set
   );
 $$;
 
-
 revoke all on function analytics_summary (text, int)
 from
   public,
@@ -440,3 +446,38 @@ from
 
 grant
 execute on function analytics_summary (text, int) to authenticated;
+
+create or replace function record_item_views (p_cafe_slug text, p_item_ids uuid[]) returns void language plpgsql security definer
+set
+  search_path = public as $$
+declare
+  v_cafe uuid;
+begin
+  if p_item_ids is null or array_length(p_item_ids, 1) is null then
+    return;
+  end if;
+  if array_length(p_item_ids, 1) > 60 then
+    raise exception 'too many items in one call';
+  end if;
+
+  select id into v_cafe from cafe where slug = p_cafe_slug and active;
+  if v_cafe is null then
+    return;
+  end if;
+
+  -- The join to menu_item means an id that is not a real dish is dropped
+  -- rather than stored, so the table cannot be filled with junk uuids.
+  insert into analytics_event (cafe_id, type, item_id)
+  select v_cafe, 'item_view', mi.id
+  from unnest(p_item_ids) as given (id)
+  join menu_item mi on mi.id = given.id;
+end;
+$$;
+
+revoke all on function record_item_views (text, uuid[])
+from
+  public;
+
+grant
+execute on function record_item_views (text, uuid[]) to anon,
+authenticated;

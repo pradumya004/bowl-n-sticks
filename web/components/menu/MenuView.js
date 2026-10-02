@@ -4,6 +4,7 @@ import SectionMenu from "./SectionMenu";
 import DishCard from "./DishCard";
 import Footer from "./Footer";
 import TrackMenuOpen from "./TrackMenuOpen";
+import TrackDishViews from "./TrackDishViews";
 
 // The whole menu page. Shared by "/" (no table) and "/t/[code]" (with a table).
 export default function MenuView({ cafe, sections, tableLabel, tableCode }) {
@@ -12,6 +13,7 @@ export default function MenuView({ cafe, sections, tableLabel, tableCode }) {
   return (
     <>
       <TrackMenuOpen tableCode={tableCode} />
+      <TrackDishViews />
       <Marquee />
       <div className="menu-wrap">
         <Hero cafe={cafe} tableLabel={tableLabel} />
