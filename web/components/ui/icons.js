@@ -54,6 +54,19 @@ export function TrashIcon() {
   );
 }
 
+export function GripIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      {[8, 12, 16].map((y) => (
+        <g key={y}>
+          <circle cx="9" cy={y} r="1.6" />
+          <circle cx="15" cy={y} r="1.6" />
+        </g>
+      ))}
+    </svg>
+  );
+}
+
 export function MenuIcon() {
   return (
     <Svg>

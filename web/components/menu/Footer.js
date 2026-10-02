@@ -28,6 +28,19 @@ export default function Footer({ cafe }) {
       )}
 
       <p className="soon">more new dishes coming soon</p>
+
+      {/* Required: the chilli is Twemoji artwork, which is CC BY 4.0. */}
+      <p className="credit">
+        Chilli icon from{" "}
+        <a
+          href="https://github.com/twitter/twemoji"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Twemoji
+        </a>{" "}
+        &copy; Twitter, Inc, CC BY 4.0
+      </p>
     </footer>
   );
 }

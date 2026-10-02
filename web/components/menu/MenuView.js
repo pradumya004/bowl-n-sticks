@@ -26,7 +26,7 @@ export default function MenuView({ cafe, sections, tableLabel }) {
           </section>
         ))}
 
-        <Footer />
+        <Footer cafe={cafe} />
       </div>
 
       {/* outside .menu-wrap: it is position:fixed and must not inherit the

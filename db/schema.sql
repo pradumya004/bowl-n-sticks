@@ -168,6 +168,63 @@ update on dining_table for each row
 execute function set_updated_at ();
 
 -- ─────────────────────────────────────────────────────────────
+-- Reordering: rewrite sort_order for a whole list in ONE atomic call, so a
+-- drag can never leave a half-applied order. unnest(ids) with ordinality turns
+-- the array into (id, position) rows; each row's sort_order becomes its
+-- position in the array. Returns how many rows moved.
+-- security invoker = runs as the caller, so RLS still applies.
+-- ─────────────────────────────────────────────────────────────
+create or replace function reorder_menu_sections (ids uuid[]) returns integer language plpgsql security invoker
+set
+  search_path = public as $$
+declare
+  moved integer;
+begin
+  update menu_section ms
+  set sort_order = pos.ord
+  from unnest(ids) with ordinality as pos (id, ord)
+  where ms.id = pos.id;
+
+  get diagnostics moved = row_count;
+  return moved;
+end;
+$$;
+
+create or replace function reorder_menu_items (ids uuid[]) returns integer language plpgsql security invoker
+set
+  search_path = public as $$
+declare
+  moved integer;
+begin
+  update menu_item mi
+  set sort_order = pos.ord
+  from unnest(ids) with ordinality as pos (id, ord)
+  where mi.id = pos.id;
+
+  get diagnostics moved = row_count;
+  return moved;
+end;
+$$;
+
+-- Postgres grants EXECUTE to PUBLIC by default and Supabase exposes functions
+-- over HTTP; take it back and give it only to logged-in users.
+revoke all on function reorder_menu_sections (uuid[])
+from
+  public,
+  anon;
+
+revoke all on function reorder_menu_items (uuid[])
+from
+  public,
+  anon;
+
+grant
+execute on function reorder_menu_sections (uuid[]) to authenticated;
+
+grant
+execute on function reorder_menu_items (uuid[]) to authenticated;
+
+-- ─────────────────────────────────────────────────────────────
 -- Row-Level Security (RLS): with RLS on, every read/write is denied
 -- unless a policy allows it. We allow the anonymous public key to READ
 -- active rows only, and grant NO write access - so the menu can't be

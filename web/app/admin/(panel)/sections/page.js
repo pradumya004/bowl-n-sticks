@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { getAdminSections } from "@/lib/adminMenu";
+import { reorderSections } from "@/lib/actions/sections";
 import AddSectionButton from "@/components/admin/sections/AddSectionButton";
 import SectionCardActions from "@/components/admin/sections/SectionCardActions";
+import SortableList from "@/components/admin/ui/SortableList";
+import SortableItem from "@/components/admin/ui/SortableItem";
 
 export default async function SectionsPage() {
   const sections = await getAdminSections();
@@ -16,9 +19,23 @@ export default async function SectionsPage() {
         <AddSectionButton />
       </div>
 
-      <ul className="admin-grid">
+      {sections.length > 1 && (
+        <p className="admin-hint">
+          Drag a card by its grip to change the order customers see.
+        </p>
+      )}
+
+      <SortableList
+        ids={sections.map((s) => s.id)}
+        action={reorderSections}
+        className="admin-grid"
+      >
         {sections.map((s) => (
-          <li key={s.id} className={`sec-card ${s.active ? "" : "is-off"}`}>
+          <SortableItem
+            key={s.id}
+            id={s.id}
+            className={`sec-card ${s.active ? "" : "is-off"}`}
+          >
             <div className="sec-card-top">
               <h3>
                 <Link href={`/admin/sections/${s.slug}`} className="sec-link">
@@ -36,9 +53,9 @@ export default async function SectionsPage() {
               {!s.active && <span className="pill pill--ink">Hidden</span>}
               <SectionCardActions section={s} />
             </div>
-          </li>
+          </SortableItem>
         ))}
-      </ul>
+      </SortableList>
     </>
   );
 }

@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAdminSection } from "@/lib/adminMenu";
+import { reorderItems } from "@/lib/actions/items";
 import AddItemButton from "@/components/admin/items/AddItemButton";
 import ItemCardActions from "@/components/admin/items/ItemCardActions";
 import OptionsButton from "@/components/admin/options/OptionsButton";
+import SortableList from "@/components/admin/ui/SortableList";
+import SortableItem from "@/components/admin/ui/SortableItem";
 import SpicyMark from "@/components/ui/SpicyMark";
 
 export default async function SectionItemsPage({ params }) {
@@ -32,10 +35,21 @@ export default async function SectionItemsPage({ params }) {
         <AddItemButton sectionId={section.id} />
       </div>
 
-      <ul className="admin-grid">
+      {section.items.length > 1 && (
+        <p className="admin-hint">
+          Drag a card by its grip to change the order customers see.
+        </p>
+      )}
+
+      <SortableList
+        ids={section.items.map((i) => i.id)}
+        action={reorderItems}
+        className="admin-grid"
+      >
         {section.items.map((item) => (
-          <li
+          <SortableItem
             key={item.id}
+            id={item.id}
             className={`sec-card ${item.active ? "" : "is-off"}`}
           >
             <div className="sec-card-top">
@@ -77,9 +91,9 @@ export default async function SectionItemsPage({ params }) {
               <OptionsButton item={item} />
               <ItemCardActions item={item} />
             </div>
-          </li>
+          </SortableItem>
         ))}
-      </ul>
+      </SortableList>
     </>
   );
 }

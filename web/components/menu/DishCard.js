@@ -3,7 +3,10 @@ import SpicyMark from "@/components/ui/SpicyMark";
 
 // One dish. Featured items get the bigger red-shadow treatment + floating thumb.
 export default function DishCard({ item }) {
-  const hasTags = item.badges?.length || item.protein_g || item.is_spicy;
+  // != null, not a truthy check: 0g protein is a real value, and `0 && <span>`
+  // renders a bare "0" on the card.
+  const hasProtein = item.protein_g != null;
+  const hasTags = item.badges?.length || hasProtein || item.is_spicy;
   return (
     <div className={`card ${item.is_featured ? "feat" : ""}`}>
       {/* 🍜 is a placeholder; real photos come in Phase 5 (item.image_url) */}
@@ -24,7 +27,7 @@ export default function DishCard({ item }) {
                 {b}
               </span>
             ))}
-            {item.protein_g && (
+            {hasProtein && (
               <span className="sticker yellow">{item.protein_g}g protein</span>
             )}
             {item.is_spicy && <SpicyMark />}

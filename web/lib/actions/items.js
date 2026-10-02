@@ -106,6 +106,22 @@ export async function toggleItem(formData) {
   refreshMenu();
 }
 
+// Takes the full list of dish ids in their new order. See reorderSections.
+export async function reorderItems(ids) {
+  const supabase = await createClient();
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return "Nothing to reorder.";
+  }
+
+  const { data, error } = await supabase.rpc("reorder_menu_items", { ids });
+  if (error) return dbFailure("reorderItems", error);
+  if (data !== ids.length) {
+    return "The menu changed while you were dragging. Refresh the page.";
+  }
+
+  refreshMenu();
+}
+
 export async function deleteItem(formData) {
   const supabase = await createClient();
   const id = formData.get("id")?.toString();

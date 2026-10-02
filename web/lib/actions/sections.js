@@ -72,6 +72,24 @@ export async function toggleSection(formData) {
   refreshMenu();
 }
 
+// Takes the full list of section ids in their new order. The database function
+// rewrites every sort_order in one atomic call and returns how many rows it
+// moved, so a count that doesn't match means the list we dragged is stale.
+export async function reorderSections(ids) {
+  const supabase = await createClient();
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return "Nothing to reorder.";
+  }
+
+  const { data, error } = await supabase.rpc("reorder_menu_sections", { ids });
+  if (error) return dbFailure("reorderSections", error);
+  if (data !== ids.length) {
+    return "The menu changed while you were dragging. Refresh the page.";
+  }
+
+  refreshMenu();
+}
+
 export async function deleteSection(formData) {
   const supabase = await createClient();
   const id = formData.get("id")?.toString();
