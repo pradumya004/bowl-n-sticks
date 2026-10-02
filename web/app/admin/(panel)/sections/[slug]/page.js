@@ -53,6 +53,7 @@ export default async function SectionItemsPage({ params }) {
           <SortableItem
             key={item.id}
             id={item.id}
+            anchor={`item-${item.id}`}
             className={`sec-card ${item.active ? "" : "is-off"}`}
           >
             <div className="sec-card-top">

@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { getAdminSections, getMenuHealth } from "@/lib/adminMenu";
 import { getAnalytics } from "@/lib/adminAnalytics";
-import BarList from "@/components/admin/stats/BarList";
-import ColumnChart from "@/components/admin/stats/ColumnChart";
 import Trend from "@/components/admin/stats/Trend";
 import Tile from "@/components/admin/stats/TileRow";
 import Attention from "@/components/admin/stats/Attention";
+import BarList from "@/components/admin/stats/BarList";
 import {
   LayersIcon,
   ListIcon,
@@ -16,36 +15,13 @@ import {
   AlertIcon,
 } from "@/components/ui/icons";
 
-const RANGES = [7, 30, 90];
-const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+// The dashboard is the overview. The charts live on /admin/analytics.
+const DAYS = 30;
 
-// 24 slots always, even the empty ones: a quiet afternoon is a finding, and
-// dropping zero columns would silently rescale the day.
-function hourSlots(byHour) {
-  const found = new Map((byHour ?? []).map((h) => [h.hour, Number(h.views)]));
-  return Array.from({ length: 24 }, (_, hour) => ({
-    label: `${hour}:00`,
-    short: hour % 6 === 0 ? `${hour}` : "",
-    value: found.get(hour) ?? 0,
-  }));
-}
-
-function daySlots(byDay) {
-  const found = new Map((byDay ?? []).map((d) => [d.dow, Number(d.views)]));
-  return DAYS.map((name, i) => ({
-    label: name,
-    short: name.slice(0, 1),
-    value: found.get(i + 1) ?? 0, // isodow: Monday = 1
-  }));
-}
-
-export default async function Dashboard({ searchParams }) {
-  const params = await searchParams;
-  const days = RANGES.includes(Number(params?.days)) ? Number(params.days) : 30;
-
+export default async function Dashboard() {
   const [sections, stats, health] = await Promise.all([
     getAdminSections(),
-    getAnalytics(days),
+    getAnalytics(DAYS),
     getMenuHealth(),
   ]);
 
@@ -58,17 +34,9 @@ export default async function Dashboard({ searchParams }) {
     <>
       <div className="admin-secthead">
         <h2>Dashboard</h2>
-        <nav className="range-switch">
-          {RANGES.map((r) => (
-            <Link
-              key={r}
-              href={`/admin?days=${r}`}
-              className={r === days ? "is-on" : ""}
-            >
-              {r}d
-            </Link>
-          ))}
-        </nav>
+        <Link href="/admin/analytics" className="btn btn--sm">
+          Full analytics →
+        </Link>
       </div>
 
       {/* The headline is a number, not a chart. One value over one window has
@@ -80,7 +48,7 @@ export default async function Dashboard({ searchParams }) {
             menu {opens === 1 ? "open" : "opens"}
           </span>
           <span className="hero-stat-sub">
-            last {days} days ·{" "}
+            last {DAYS} days ·{" "}
             {Number(stats?.section_views ?? 0).toLocaleString("en-IN")} section
             views
           </span>
@@ -134,7 +102,6 @@ export default async function Dashboard({ searchParams }) {
             value: Number(t.views),
           }))}
         />
-
         <BarList
           title="Most looked at"
           empty="Nobody has scrolled the menu yet."
@@ -142,18 +109,6 @@ export default async function Dashboard({ searchParams }) {
             label: s.name,
             value: Number(s.views),
           }))}
-        />
-
-        <ColumnChart
-          title="Busiest hours"
-          empty="Not enough visits yet to see a pattern."
-          slots={hourSlots(stats?.by_hour)}
-        />
-
-        <ColumnChart
-          title="Busiest days"
-          empty="Not enough visits yet to see a pattern."
-          slots={daySlots(stats?.by_day)}
         />
       </div>
 
@@ -163,35 +118,35 @@ export default async function Dashboard({ searchParams }) {
             label: "dishes have no photo",
             note: "Photos are the single biggest thing that makes a menu look finished",
             count: health.noPhoto,
-            href: "/admin/sections",
+            href: "/admin/needs/no-photo",
             icon: <CameraIcon />,
           },
           {
             label: "dishes have no price",
             note: 'These show as "MRP" on the menu',
             count: health.noPrice,
-            href: "/admin/sections",
+            href: "/admin/needs/no-price",
             icon: <TagIcon />,
           },
           {
             label: "dishes are hidden",
             note: "Customers cannot see these right now",
             count: health.hiddenItems,
-            href: "/admin/sections",
+            href: "/admin/needs/hidden-dishes",
             icon: <EyeOffIcon />,
           },
           {
             label: "sections are hidden",
             note: "Hidden sections and everything in them stay off the menu",
             count: hiddenCount,
-            href: "/admin/sections",
+            href: "/admin/needs/hidden-sections",
             icon: <EyeOffIcon />,
           },
           {
             label: "sections have no dishes",
             note: "Empty sections never appear on the customer menu",
             count: emptyCount,
-            href: "/admin/sections",
+            href: "/admin/needs/empty-sections",
             icon: <AlertIcon />,
           },
         ]}

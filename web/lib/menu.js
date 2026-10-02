@@ -8,7 +8,7 @@ export async function getMenu() {
   const [cafeRes, sectionsRes] = await Promise.all([
     supabase
       .from("cafe")
-      .select("name, tagline, timings, socials, rules")
+      .select("name, tagline, timings, address, maps_url, phone, socials, rules")
       .eq("slug", CAFE_SLUG)
       .maybeSingle(), // one row as an object, or null if the cafe is missing
       // (maybeSingle, not single, so an empty DB returns null gracefully

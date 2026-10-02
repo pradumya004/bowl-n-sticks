@@ -142,7 +142,7 @@ Veg/egg/non-veg/spicy tags, combo upgrades, and toppings from the real menu all 
 - [ ] Item-level views — deliberately skipped: a per-card observer on 141 dishes is a lot of noise for a question section views already answer.
 
 ### Phase 7 — Deploy, Domain & Performance
-- [ ] Custom domain (e.g. maggilicious.com) — optional, when ready.
+- [ ] **Custom domain — decide BEFORE printing QR cards.** They currently encode `bowl-n-sticks.vercel.app`; changing the domain after printing means reprinting every card.
 - [ ] Caching/ISR so menu is instant; Lighthouse pass.
 - [ ] Backups + basic monitoring.
 
@@ -209,6 +209,8 @@ Set in `web/.env.local` (local dev) AND in Vercel → Settings → Environment V
 ---
 
 ## 12. Status Log
+
+- **2026-10-03 (admin IA + settings)** — **Needs-attention rows now deep-link to the actual rows**, not a generic list page: `/admin/needs/<kind>` names each dish and its section, and the Fix link jumps to `#item-<id>` where the card flags itself via `:target`. A count with nowhere to click is noise. **Sidebar emoji replaced with drawn icons** matching the dashboard, and two badges that had become lies were fixed: Photos now points at the dishes still missing one, Analytics got its own page at `/admin/analytics` (range switcher + all four charts) so the dashboard stays an overview. **Cafe Settings built** (migration 007 adds `address`, `maps_url`, `phone`): name, tagline, address + maps link, phone, opening hours, Instagram/Zomato/Swiggy, and house rules one-per-line - all editable, all rendered in the live menu footer, nothing hard-coded. `maps_url` is validated to http(s) so a `javascript:` URL can't reach a page every customer opens. Verified settings, needs and analytics at 400px and 700px. **Still "Soon": Meme Feed (Phase 9, parked) and QR Codes.**
 
 - **2026-10-03 (dashboard polish)** — Bottom of the dashboard was four plain white boxes with an emoji, inconsistent with the panels above. Rebuilt as proper tiles: drawn icon in a yellow chip, big number, the same ink border, hard shadow and hover lift the rest of the app uses. Filled the dead space below with **Needs attention** - dishes with no photo, dishes with no price, hidden dishes, hidden sections, sections with no dishes - each row linking to where you'd fix it, because a count with nowhere to click is noise. Counts come from `getMenuHealth()`, which uses `menu_section!inner(cafe_id)` so they stay correct once a second branch exists. Checked at 390px and 820px. Deleted the test events afterwards; `analytics_event` is back to 0.
 

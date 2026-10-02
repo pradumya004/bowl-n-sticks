@@ -125,3 +125,94 @@ export async function getMenuHealth() {
     hiddenItems: hiddenItems.count ?? 0,
   };
 }
+
+// The "needs attention" rows on the dashboard each open one of these. A count
+// with nowhere to go is useless: clicking "1 dish has no price" should say
+// WHICH dish and take you to it.
+export const NEEDS = {
+  "no-photo": {
+    title: "Dishes with no photo",
+    note: "A photo is the single biggest thing that makes a menu look finished.",
+  },
+  "no-price": {
+    title: "Dishes with no price",
+    note: 'These render as "MRP" on the customer menu.',
+  },
+  "hidden-dishes": {
+    title: "Hidden dishes",
+    note: "Customers cannot see these. Row-level security hides them at the database, not just in the UI.",
+  },
+  "hidden-sections": {
+    title: "Hidden sections",
+    note: "A hidden section takes everything inside it off the menu too.",
+  },
+  "empty-sections": {
+    title: "Sections with no dishes",
+    note: "An empty section never appears on the customer menu.",
+  },
+};
+
+export async function getNeeds(kind) {
+  const spec = NEEDS[kind];
+  if (!spec) {
+    return null;
+  }
+
+  const supabase = await createClient();
+  const { data: cafe } = await supabase
+    .from("cafe")
+    .select("id")
+    .eq("slug", CAFE_SLUG)
+    .maybeSingle();
+  if (!cafe) {
+    return { ...spec, kind, rows: [] };
+  }
+
+  // Sections and dishes are different shapes, so each branch returns the same
+  // {id, name, where, href} and the page stays simple.
+  if (kind === "hidden-sections" || kind === "empty-sections") {
+    const { data } = await supabase
+      .from("menu_section")
+      .select("id, name, slug, active, menu_item(count)")
+      .eq("cafe_id", cafe.id)
+      .order("sort_order");
+
+    const rows = (data ?? [])
+      .map((s) => ({ ...s, itemCount: s.menu_item?.[0]?.count ?? 0 }))
+      .filter((s) =>
+        kind === "hidden-sections" ? !s.active : s.itemCount === 0,
+      )
+      .map((s) => ({
+        id: s.id,
+        name: s.name,
+        where: `${s.itemCount} ${s.itemCount === 1 ? "dish" : "dishes"}`,
+        href: `/admin/sections/${s.slug}`,
+      }));
+
+    return { ...spec, kind, rows };
+  }
+
+  let query = supabase
+    .from("menu_item")
+    .select("id, name, menu_section!inner(name, slug, cafe_id)")
+    .eq("menu_section.cafe_id", cafe.id)
+    .order("name");
+
+  if (kind === "no-photo") query = query.is("image_path", null);
+  if (kind === "no-price") query = query.is("price", null);
+  if (kind === "hidden-dishes") query = query.eq("active", false);
+
+  const { data } = await query;
+
+  return {
+    ...spec,
+    kind,
+    rows: (data ?? []).map((i) => ({
+      id: i.id,
+      name: i.name,
+      where: i.menu_section.name,
+      // the #item- anchor scrolls to and highlights the exact card
+      href: `/admin/sections/${i.menu_section.slug}#item-${i.id}`,
+    })),
+  };
+}

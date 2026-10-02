@@ -26,6 +26,9 @@ create table if not exists cafe (
   name text not null,
   tagline text,
   logo_url text,
+  address text, -- shown in the menu footer
+  maps_url text, -- Google Maps link for the address
+  phone text,
   timings text,
   socials jsonb not null default '{}'::jsonb, -- flexible bag: { instagram, zomato, swiggy }
   rules text[] not null default '{}', -- the "basic rules" list, one string per rule

@@ -1,6 +1,15 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  GridIcon,
+  BowlIcon,
+  CameraIcon,
+  SmileIcon,
+  QrIcon,
+  ChartIcon,
+  GearIcon,
+} from "@/components/ui/icons";
 
 // The whole admin map, including areas not built yet (they render as "Soon" and
 // aren't clickable). As each phase lands, delete its `soon` and add the `href`.
@@ -8,28 +17,32 @@ const GROUPS = [
   {
     label: "Menu",
     links: [
-      { href: "/admin", label: "Dashboard", icon: "📊" },
-      { href: "/admin/sections", label: "Sections", icon: "🍜" },
+      { href: "/admin", label: "Dashboard", icon: <GridIcon /> },
+      { href: "/admin/sections", label: "Sections", icon: <BowlIcon /> },
     ],
   },
   {
     label: "Content",
     links: [
-      { label: "Photos & Video", icon: "🖼", soon: true },
-      { label: "Meme Feed", icon: "😹", soon: true },
+      // Photos exist now, so this points at the dishes still missing one -
+      // which is the only reason you'd open a photos screen.
+      { href: "/admin/needs/no-photo", label: "Photos", icon: <CameraIcon /> },
+      { label: "Meme Feed", icon: <SmileIcon />, soon: true },
     ],
   },
   {
     label: "Tables",
-    links: [{ label: "QR Codes", icon: "🔳", soon: true }],
+    links: [{ label: "QR Codes", icon: <QrIcon />, soon: true }],
   },
   {
     label: "Insights",
-    links: [{ label: "Analytics", icon: "📈", soon: true }],
+    links: [
+      { href: "/admin/analytics", label: "Analytics", icon: <ChartIcon /> },
+    ],
   },
   {
     label: "Settings",
-    links: [{ label: "Cafe Settings", icon: "⚙️", soon: true }],
+    links: [{ href: "/admin/settings", label: "Cafe Settings", icon: <GearIcon /> }],
   },
 ];
 
@@ -46,7 +59,9 @@ export default function AdminNav() {
             if (link.soon) {
               return (
                 <span key={link.label} className="nav-item is-soon">
-                  <span className="nav-ico" aria-hidden="true">{link.icon}</span>
+                  <span className="nav-ico" aria-hidden="true">
+                    {link.icon}
+                  </span>
                   <span className="nav-text">{link.label}</span>
                   <span className="pill pill--yellow nav-soon">Soon</span>
                 </span>
@@ -67,7 +82,9 @@ export default function AdminNav() {
                 aria-current={active ? "page" : undefined}
                 className={`nav-item ${active ? "is-on" : ""}`}
               >
-                <span className="nav-ico" aria-hidden="true">{link.icon}</span>
+                <span className="nav-ico" aria-hidden="true">
+                    {link.icon}
+                  </span>
                 <span className="nav-text">{link.label}</span>
               </Link>
             );

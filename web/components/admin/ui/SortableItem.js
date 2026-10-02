@@ -5,12 +5,13 @@ import { GripIcon } from "@/components/ui/icons";
 
 // One draggable card. The grip strip is the only drag target, so Edit, Delete
 // and the section link keep working normally.
-export default function SortableItem({ id, className = "", children }) {
+export default function SortableItem({ id, anchor, className = "", children }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id });
 
   return (
     <li
+      id={anchor}
       ref={setNodeRef}
       className={`${className} ${isDragging ? "is-dragging" : ""}`}
       style={{ transform: CSS.Transform.toString(transform), transition }}

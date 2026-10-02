@@ -158,3 +158,70 @@ export function AlertIcon() {
     </Svg>
   );
 }
+
+export function GridIcon() {
+  return (
+    <Svg>
+      <path d="M4 4h7v7H4z" />
+      <path d="M13 4h7v7h-7z" />
+      <path d="M4 13h7v7H4z" />
+      <path d="M13 13h7v7h-7z" />
+    </Svg>
+  );
+}
+
+export function BowlIcon() {
+  return (
+    <Svg>
+      <path d="M3 11h18a9 9 0 0 1-18 0z" />
+      <path d="M8.5 7.5c0-1.5 1.5-1.5 1.5-3" />
+      <path d="M12.5 7.5c0-1.5 1.5-1.5 1.5-3" />
+    </Svg>
+  );
+}
+
+export function SmileIcon() {
+  return (
+    <Svg>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M9 14.5c.8.9 1.8 1.3 3 1.3s2.2-.4 3-1.3" />
+      <path d="M9.2 9.5h.01" />
+      <path d="M14.8 9.5h.01" />
+    </Svg>
+  );
+}
+
+export function QrIcon() {
+  return (
+    <Svg>
+      <path d="M4 4h5v5H4z" />
+      <path d="M15 4h5v5h-5z" />
+      <path d="M4 15h5v5H4z" />
+      <path d="M15 15h2v2h-2z" />
+      <path d="M19 19h1" />
+      <path d="M15 20h1" />
+      <path d="M20 15h.01" />
+    </Svg>
+  );
+}
+
+export function ChartIcon() {
+  return (
+    <Svg>
+      <path d="M4 20V4" />
+      <path d="M4 20h16" />
+      <path d="M8 20v-6" />
+      <path d="M13 20V9" />
+      <path d="M18 20v-9" />
+    </Svg>
+  );
+}
+
+export function GearIcon() {
+  return (
+    <Svg>
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 2.5v2.2M12 19.3v2.2M4.2 7.3l1.9 1.1M17.9 15.6l1.9 1.1M4.2 16.7l1.9-1.1M17.9 8.4l1.9-1.1" />
+    </Svg>
+  );
+}
