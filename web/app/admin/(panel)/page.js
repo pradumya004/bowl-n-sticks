@@ -1,9 +1,20 @@
 import Link from "next/link";
-import { getAdminSections } from "@/lib/adminMenu";
+import { getAdminSections, getMenuHealth } from "@/lib/adminMenu";
 import { getAnalytics } from "@/lib/adminAnalytics";
 import BarList from "@/components/admin/stats/BarList";
 import ColumnChart from "@/components/admin/stats/ColumnChart";
 import Trend from "@/components/admin/stats/Trend";
+import Tile from "@/components/admin/stats/TileRow";
+import Attention from "@/components/admin/stats/Attention";
+import {
+  LayersIcon,
+  ListIcon,
+  EyeOffIcon,
+  ExternalIcon,
+  CameraIcon,
+  TagIcon,
+  AlertIcon,
+} from "@/components/ui/icons";
 
 const RANGES = [7, 30, 90];
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -32,13 +43,15 @@ export default async function Dashboard({ searchParams }) {
   const params = await searchParams;
   const days = RANGES.includes(Number(params?.days)) ? Number(params.days) : 30;
 
-  const [sections, stats] = await Promise.all([
+  const [sections, stats, health] = await Promise.all([
     getAdminSections(),
     getAnalytics(days),
+    getMenuHealth(),
   ]);
 
   const itemCount = sections.reduce((total, s) => total + s.itemCount, 0);
   const hiddenCount = sections.filter((s) => !s.active).length;
+  const emptyCount = sections.filter((s) => s.itemCount === 0).length;
   const opens = Number(stats?.menu_opens ?? 0);
 
   return (
@@ -80,6 +93,38 @@ export default async function Dashboard({ searchParams }) {
         />
       </section>
 
+      <div className="tile-row">
+        <Tile
+          icon={<LayersIcon />}
+          value={sections.length}
+          label="Sections"
+          note="Manage the menu"
+          href="/admin/sections"
+        />
+        <Tile
+          icon={<ListIcon />}
+          value={itemCount}
+          label="Dishes"
+          note="Across every section"
+          href="/admin/sections"
+        />
+        <Tile
+          icon={<EyeOffIcon />}
+          value={hiddenCount + health.hiddenItems}
+          label="Hidden"
+          note="Sections and dishes off the menu"
+          href="/admin/sections"
+        />
+        <Tile
+          icon={<ExternalIcon />}
+          value="Open"
+          label="Live menu"
+          note="See what customers see"
+          href="/"
+          external
+        />
+      </div>
+
       <div className="stat-grid">
         <BarList
           title="Scans per table"
@@ -112,36 +157,45 @@ export default async function Dashboard({ searchParams }) {
         />
       </div>
 
-      <div className="admin-grid">
-        <Link href="/admin/sections" className="sec-card stat-card">
-          <span className="stat-num">{sections.length}</span>
-          <span className="stat-label">Sections</span>
-          <span className="stat-go">Manage →</span>
-        </Link>
-
-        <Link href="/admin/sections" className="sec-card stat-card">
-          <span className="stat-num">{itemCount}</span>
-          <span className="stat-label">Dishes</span>
-          <span className="stat-go">Manage →</span>
-        </Link>
-
-        <div className="sec-card stat-card">
-          <span className="stat-num">{hiddenCount}</span>
-          <span className="stat-label">Hidden sections</span>
-          <span className="stat-go">Not shown to customers</span>
-        </div>
-
-        <a
-          href="/"
-          target="_blank"
-          rel="noreferrer"
-          className="sec-card stat-card"
-        >
-          <span className="stat-num">👀</span>
-          <span className="stat-label">View live menu</span>
-          <span className="stat-go">Opens in a new tab →</span>
-        </a>
-      </div>
+      <Attention
+        rows={[
+          {
+            label: "dishes have no photo",
+            note: "Photos are the single biggest thing that makes a menu look finished",
+            count: health.noPhoto,
+            href: "/admin/sections",
+            icon: <CameraIcon />,
+          },
+          {
+            label: "dishes have no price",
+            note: 'These show as "MRP" on the menu',
+            count: health.noPrice,
+            href: "/admin/sections",
+            icon: <TagIcon />,
+          },
+          {
+            label: "dishes are hidden",
+            note: "Customers cannot see these right now",
+            count: health.hiddenItems,
+            href: "/admin/sections",
+            icon: <EyeOffIcon />,
+          },
+          {
+            label: "sections are hidden",
+            note: "Hidden sections and everything in them stay off the menu",
+            count: hiddenCount,
+            href: "/admin/sections",
+            icon: <EyeOffIcon />,
+          },
+          {
+            label: "sections have no dishes",
+            note: "Empty sections never appear on the customer menu",
+            count: emptyCount,
+            href: "/admin/sections",
+            icon: <AlertIcon />,
+          },
+        ]}
+      />
     </>
   );
 }

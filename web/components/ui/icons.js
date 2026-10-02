@@ -98,3 +98,63 @@ export function SlidersIcon() {
     </Svg>
   );
 }
+
+export function LayersIcon() {
+  return (
+    <Svg>
+      <path d="M12 3l9 5-9 5-9-5 9-5z" />
+      <path d="M3 13l9 5 9-5" />
+    </Svg>
+  );
+}
+
+export function ListIcon() {
+  return (
+    <Svg>
+      <path d="M9 6h11" />
+      <path d="M9 12h11" />
+      <path d="M9 18h11" />
+      <path d="M4.5 6h.01" />
+      <path d="M4.5 12h.01" />
+      <path d="M4.5 18h.01" />
+    </Svg>
+  );
+}
+
+export function ExternalIcon() {
+  return (
+    <Svg>
+      <path d="M14 4h6v6" />
+      <path d="M20 4l-8.5 8.5" />
+      <path d="M19 14v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5" />
+    </Svg>
+  );
+}
+
+export function CameraIcon() {
+  return (
+    <Svg>
+      <path d="M3 8.5h3.5L8 6h8l1.5 2.5H21v10H3z" />
+      <circle cx="12" cy="13" r="3.2" />
+    </Svg>
+  );
+}
+
+export function TagIcon() {
+  return (
+    <Svg>
+      <path d="M4 4h7l9 9-7 7-9-9V4z" />
+      <path d="M8 8h.01" />
+    </Svg>
+  );
+}
+
+export function AlertIcon() {
+  return (
+    <Svg>
+      <path d="M12 4l9 16H3l9-16z" />
+      <path d="M12 10v4" />
+      <path d="M12 17h.01" />
+    </Svg>
+  );
+}

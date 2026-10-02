@@ -88,3 +88,40 @@ export async function getAdminSection(slug) {
       })),
   };
 }
+
+// Counts for the dashboard's "needs attention" panel. Each one is a thing the
+// owner can actually go and fix, which is the only reason to show a number.
+// head: true means Postgres returns the count without sending any rows.
+export async function getMenuHealth() {
+  const supabase = await createClient();
+
+  const { data: cafe } = await supabase
+    .from("cafe")
+    .select("id")
+    .eq("slug", CAFE_SLUG)
+    .maybeSingle();
+
+  if (!cafe) {
+    return { noPhoto: 0, noPrice: 0, hiddenItems: 0 };
+  }
+
+  // !inner turns the embedded section into a join, so the filter on cafe_id
+  // applies. Without it these counts would span every cafe once we franchise.
+  const base = () =>
+    supabase
+      .from("menu_item")
+      .select("id, menu_section!inner(cafe_id)", { count: "exact", head: true })
+      .eq("menu_section.cafe_id", cafe.id);
+
+  const [noPhoto, noPrice, hiddenItems] = await Promise.all([
+    base().is("image_path", null),
+    base().is("price", null),
+    base().eq("active", false),
+  ]);
+
+  return {
+    noPhoto: noPhoto.count ?? 0,
+    noPrice: noPrice.count ?? 0,
+    hiddenItems: hiddenItems.count ?? 0,
+  };
+}
