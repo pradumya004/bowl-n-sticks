@@ -12,7 +12,7 @@ export default function DishCard({ item }) {
   const photo = mediaUrl(item.image_path);
   return (
     <div className={`card ${item.is_featured ? "feat" : ""}`}>
-      <div className="thumb">
+      <div className={`thumb ${photo ? "has-photo" : ""}`}>
         {photo ? (
           /* sizes tells next/image which widths to generate: the thumb is 76px
              (92px when featured), so it never ships a full-size photo to a phone */

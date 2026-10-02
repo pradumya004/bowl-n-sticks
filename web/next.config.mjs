@@ -1,3 +1,5 @@
+import { fileURLToPath } from "node:url";
+
 /** @type {import('next').NextConfig} */
 
 // next/image only optimizes remote images from hosts listed here, so Supabase
@@ -7,7 +9,13 @@ const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
   : undefined;
 
+// The repo root has its own package.json for the db tooling, so Next would
+// otherwise guess the workspace root is one level up and trace the wrong files.
+const here = fileURLToPath(new URL(".", import.meta.url));
+
 const nextConfig = {
+  turbopack: { root: here },
+  outputFileTracingRoot: here,
   images: {
     remotePatterns: supabaseHost
       ? [

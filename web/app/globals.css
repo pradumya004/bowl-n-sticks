@@ -77,6 +77,13 @@ body {
     transform: translateY(-6px) rotate(-3deg);
   }
 }
+/* Same lift, no wobble. bob's -3deg suits a sticker stuck on at an angle (the
+   404 stickers); on a dish tile that sits inside a card it reads as crooked. */
+@keyframes float {
+  50% {
+    transform: translateY(-5px);
+  }
+}
 @keyframes wiggle {
   0%,
   100% {
@@ -240,7 +247,7 @@ body {
   flex-basis: 92px;
   height: 92px;
   font-size: 42px;
-  animation: bob 2.6s ease-in-out infinite;
+  animation: float 3s ease-in-out infinite;
 }
 
 .diet {
@@ -2000,4 +2007,21 @@ input:-webkit-autofill:focus {
   border: var(--line-sm) solid var(--color-ink);
   border-radius: var(--r-sm);
   cursor: pointer;
+}
+
+/* A real photo must not bob. The float was designed for the emoji sticker;
+   on a photograph it reads as the image being unstable. Photos get a
+   deliberate zoom on hover instead of constant idle motion. */
+.thumb.has-photo {
+  background: var(--color-ink);
+  animation: none;
+}
+.feat .thumb.has-photo {
+  animation: none;
+}
+.thumb-img {
+  transition: transform 0.3s ease;
+}
+.card:hover .thumb.has-photo .thumb-img {
+  transform: scale(1.07);
 }

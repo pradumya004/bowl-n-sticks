@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAdminSection } from "@/lib/adminMenu";
 import { reorderItems } from "@/lib/actions/items";
-import { uploadItemImage, removeItemImage } from "@/lib/actions/media";
+import { setItemImage, removeItemImage } from "@/lib/actions/media";
 import AddItemButton from "@/components/admin/items/AddItemButton";
 import ItemCardActions from "@/components/admin/items/ItemCardActions";
 import OptionsButton from "@/components/admin/options/OptionsButton";
@@ -94,8 +94,9 @@ export default async function SectionItemsPage({ params }) {
               <PhotoButton
                 id={item.id}
                 name={item.name}
+                folder="items"
                 imagePath={item.image_path}
-                onUpload={uploadItemImage}
+                onSave={setItemImage}
                 onRemove={removeItemImage}
               />
               <OptionsButton item={item} />

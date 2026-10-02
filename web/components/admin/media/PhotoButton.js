@@ -1,42 +1,93 @@
 "use client";
-import { useRef, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import Image from "next/image";
 import Modal from "@/components/admin/ui/Modal";
-import { mediaUrl } from "@/lib/storage";
+import { createClient } from "@/lib/supabase/client";
+import { mediaUrl, MEDIA_BUCKET } from "@/lib/storage";
 
-// Photo chip on a card + the modal that uploads, replaces or removes it.
-// Separate from the Edit form on purpose: a file upload is a different kind of
-// write (it touches Storage, not just a row) and shouldn't ride along with a
-// text form the user might cancel.
-export default function PhotoButton({ id, name, imagePath, onUpload, onRemove }) {
+// Extensions we accept, keyed by mime type. Matches the bucket's allowlist.
+const TYPES = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/avif": "avif",
+};
+const MAX_BYTES = 5 * 1024 * 1024;
+
+// Photo chip on a card, plus the modal that uploads, replaces or removes it.
+//
+// The file goes BROWSER -> STORAGE directly, never through a Server Action: the
+// action body is capped at 1 MB by Next and 4.5 MB by Vercel, which no phone
+// photo fits inside. The action is then called with just the path.
+export default function PhotoButton({ id, name, folder, imagePath, onSave, onRemove }) {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState(null);
+  const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [pending, startTransition] = useTransition();
-  const inputRef = useRef(null);
 
   const current = mediaUrl(imagePath);
 
   function close() {
     setError(null);
+    setFile(null);
     setPreview(null);
     setOpen(false);
   }
 
-  // Show the chosen file immediately, before it has uploaded, so there is no
-  // dead moment between picking and seeing.
+  // Checked here for a readable message. The bucket enforces the same limits
+  // regardless, so this is convenience, not security.
   function handlePick(e) {
-    const file = e.target.files?.[0];
+    const picked = e.target.files?.[0] ?? null;
     setError(null);
-    setPreview(file ? URL.createObjectURL(file) : null);
+    setFile(null);
+    setPreview(null);
+    if (!picked) {
+      return;
+    }
+    if (!TYPES[picked.type]) {
+      setError("That file type isn't supported. Use JPG, PNG, WebP or AVIF.");
+      return;
+    }
+    if (picked.size > MAX_BYTES) {
+      setError(
+        `That photo is ${(picked.size / 1024 / 1024).toFixed(1)} MB. The limit is 5 MB.`,
+      );
+      return;
+    }
+    setFile(picked);
+    setPreview(URL.createObjectURL(picked));
   }
 
   function handleUpload(e) {
     e.preventDefault();
-    const form = e.currentTarget;
-    const formData = new FormData(form);
+    if (!file) {
+      setError("Choose a photo first.");
+      return;
+    }
+
     startTransition(async () => {
-      const message = await onUpload(formData);
+      // A fresh random name every time. Reusing a path would keep serving the
+      // old photo from the CDN cache for hours after a replace.
+      const path = `${folder}/${crypto.randomUUID()}.${TYPES[file.type]}`;
+      const supabase = createClient();
+
+      const { error: uploadError } = await supabase.storage
+        .from(MEDIA_BUCKET)
+        .upload(path, file, { contentType: file.type });
+      if (uploadError) {
+        setError(
+          uploadError.message?.includes("exceeded")
+            ? "That photo is over the 5 MB limit."
+            : "The photo didn't upload. Check your connection and try again.",
+        );
+        return;
+      }
+
+      const formData = new FormData();
+      formData.set("id", id);
+      formData.set("path", path);
+      const message = await onSave(formData);
       if (message) {
         setError(message);
         return;
@@ -70,12 +121,10 @@ export default function PhotoButton({ id, name, imagePath, onUpload, onRemove })
 
       <Modal open={open} onClose={close} kicker="Photo" title={name}>
         <form className="modal-form" onSubmit={handleUpload}>
-          <input type="hidden" name="id" value={id} />
-
           <div className="photo-stage">
             {preview ? (
-              /* a blob: URL from the file the user just picked, not yet uploaded,
-                 so next/image can't optimize it */
+              /* a blob: URL for the file just picked, not uploaded yet, so
+                 next/image cannot optimize it */
               // eslint-disable-next-line @next/next/no-img-element
               <img src={preview} alt="" />
             ) : current ? (
@@ -90,9 +139,7 @@ export default function PhotoButton({ id, name, imagePath, onUpload, onRemove })
               Choose a photo <em>(JPG, PNG, WebP or AVIF, up to 5 MB)</em>
             </span>
             <input
-              ref={inputRef}
               type="file"
-              name="file"
               accept="image/jpeg,image/png,image/webp,image/avif"
               onChange={handlePick}
             />
@@ -114,7 +161,11 @@ export default function PhotoButton({ id, name, imagePath, onUpload, onRemove })
             <button type="button" className="btn" onClick={close}>
               Cancel
             </button>
-            <button type="submit" className="btn btn--primary" disabled={pending}>
+            <button
+              type="submit"
+              className="btn btn--primary"
+              disabled={pending || !file}
+            >
               {pending ? "Uploading..." : imagePath ? "Replace" : "Upload"}
             </button>
           </div>
