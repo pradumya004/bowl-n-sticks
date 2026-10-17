@@ -21,3 +21,8 @@ npm-debug.log*
 Thumbs.db
 .idea/
 *.swp
+
+# local agent notes and editor workspace
+CLAUDE.md
+AGENTS.md
+*.code-workspace

@@ -1,8 +1,7 @@
 // Resolves the app's "@/..." alias and swaps the two modules that need a real
 // Next/Supabase runtime for local stubs, so the REAL action code can run in Node.
-import { pathToFileURL } from "node:url";
 
-const WEB = pathToFileURL("D:/Projects/CAFE/web/").href;
+const WEB = new URL("../", import.meta.url).href;
 const HERE = import.meta.url;
 
 export function resolve(specifier, context, next) {
