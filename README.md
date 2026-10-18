@@ -5,10 +5,12 @@ QR digital menu and admin panel for an anime-themed cafe in Karwar. Customers sc
 Freelance client project. **Live:** https://bowl-n-sticks.vercel.app
 
 <p>
-  <img src="docs/menu-mobile.png" alt="Menu on a phone: hero, search, diet filters, combo meals" width="260">
+  <img src="docs/demo.webp" alt="The menu on a phone: the veg filter, then a search for ramen" width="240">
   &nbsp;
   <img src="docs/menu-desktop.png" alt="Menu on desktop: four-column dish cards with prices, tags and add-ons" width="560">
 </p>
+
+[Watch the 15 s launch clip](docs/launch.mp4)
 
 ## Features
 
