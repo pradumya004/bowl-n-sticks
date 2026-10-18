@@ -4,9 +4,9 @@ QR menu and admin panel for an anime-themed cafe in Karwar. Customers scan the c
 
 Freelance client project, live for a real cafe.
 
-**Live menu:** https://bowl-n-sticks.vercel.app &nbsp;·&nbsp; **Film:** [docs/launch.mp4](docs/launch.mp4) (13 s)
+**Live menu:** https://bowl-n-sticks.vercel.app &nbsp;·&nbsp; **Film:** [docs/launch.mp4](docs/launch.mp4) (37 s, with sound)
 
-[![Film: a phone reads the table QR, the menu filters to veg in one tap, the featured combo lifts out and flips into the wordmark](docs/film.webp)](docs/launch.mp4)
+[![Film: a phone reads the table QR, the menu opens with no app or signup, and one tap on Veg clears the egg and chicken dishes](docs/film.webp)](docs/launch.mp4)
 
 <p>
   <img src="docs/demo.webp" alt="The menu on a phone: the veg filter, then a search for ramen" width="240">
