@@ -18,7 +18,7 @@ Here there is **one program**, Next.js, and it decides per file whether code run
 | `app.get("/api/menu")` route | a file at `app/page.js` that fetches directly |
 | `axios.get("/api/menu")` in React | no fetch at all - the server already has the data |
 | `mongoose.find()` / `pool.query()` | `supabase.from("menu_item").select(...)` |
-| `jsonwebtoken` + `authMiddleware` | Supabase Auth + `middleware.js` + RLS |
+| `jsonwebtoken` + `authMiddleware` | Supabase Auth + `proxy.js` + RLS |
 
 **The rule that tells you which is which: `"use client"` at the top of the file.**
 
@@ -47,7 +47,7 @@ lib/                  LOGIC       reads, writes, database, auth
 | `lib/menu.js` | **reads** for the customer menu |
 | `lib/adminMenu.js` | **reads** for the admin panel (includes hidden rows) |
 | `lib/actions/*.js` | **writes** - create / update / delete |
-| `middleware.js` | the gate: blocks `/admin/*` when not signed in |
+| `proxy.js` | the gate (Next 16 renamed `middleware.js` to `proxy.js`): blocks `/admin/*` when not signed in |
 
 Three connections, not one, because **each carries a different identity**, and the database grants different rights to each. That is the whole security model. Section 6.
 
@@ -185,7 +185,7 @@ Supabase Auth. `app/admin/login/page.js` calls `signInWithPassword`, Supabase se
 
 ### Authorization - *what may you do?* (two layers)
 
-**Layer 1, `middleware.js`** runs before any `/admin/*` page. No session → redirect to login. This protects **pages**.
+**Layer 1, `proxy.js`** runs before any `/admin/*` page. No session → redirect to login. This protects **pages**.
 
 **Layer 2, Row-Level Security** in `db/schema.sql` + `db/admin-policies.sql`. This protects **data**, and it lives in the database itself:
 
@@ -199,7 +199,7 @@ create policy "admin all menu_item" on menu_item
   for all to authenticated using (true) with check (true);
 ```
 
-Why both? Because **middleware can be bypassed and RLS cannot.** The public key is in the browser, visible to anyone. Someone could take it and call the Supabase API directly, skipping our app entirely. RLS still stops them: Postgres refuses the write. Middleware is convenience; RLS is the actual wall.
+Why both? Because **the proxy can be bypassed and RLS cannot.** The public key is in the browser, visible to anyone. Someone could take it and call the Supabase API directly, skipping our app entirely. RLS still stops them: Postgres refuses the write. The proxy is convenience; RLS is the actual wall.
 
 This is also why "hidden" really is hidden. `active = false` means the anon key cannot see the row at all - it isn't fetched and hidden with CSS.
 
